@@ -1,0 +1,803 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+// Generated Help ID header file
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.hm"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\MUS.ico"
+IDR_REVWARE             ICON                    "res\\revware.ico"
+IDI_GOPOINT             ICON                    "res\\gopoint.ico"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""afxres.rc""         //Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 280, 124
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About MicroScribe Utility Software"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         229,IDC_STATIC,"Static",SS_BITMAP,6,6,151,54,WS_EX_TRANSPARENT
+    CTEXT           "Version 6.0.1",IDC_PRODUCT_VERSION,174,44,100,9,SS_NOPREFIX
+    LTEXT           "Copyright © 1992-2011, Revware, Inc.",IDC_COPYRIGHT_NOTICE,6,64,127,8
+    DEFPUSHBUTTON   "OK",IDOK,238,6,36,14,WS_GROUP
+    CTEXT           "MicroScribe Utility Software ",IDC_PRODUCT_NAME,174,34,100,9,SS_NOPREFIX
+    RTEXT           "This is licensed software subject to international copyright law.\nUse of this software indicates your acceptance of the terms and conditions of the Revware license agreement, a copy of which may be viewed in the on-line help system.",IDC_LICENSE_NOTICE,158,64,114,56
+    LTEXT           "Product Support Resources:",IDC_SUPPORT_NOTE,6,94,122,8
+    LTEXT           "Web: www.microscribe.com/support",IDC_SUPPORT_WEB,6,103,122,8
+    LTEXT           "Email: support@microscribe.com",IDC_SUPPORT_EMAIL,6,112,122,8
+    LTEXT           "Revware is a trademark and MicroScribe is a registered trademark of Revware, Inc.",IDC_TRADEMARK_NOTICE,6,73,133,19
+END
+
+IDD_CONNECT DIALOG 0, 0, 125, 61
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MicroScribe Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_CMB_PORT,7,12,49,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_BAUD,68,12,48,51,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Connect",IDC_BTN_CONNECT,68,42,50,12
+    DEFPUSHBUTTON   "&Done",IDOK,7,42,35,12
+    LTEXT           "Baud",IDC_STATIC,68,3,26,9
+    LTEXT           "Port",IDC_STATIC,7,3,31,9
+    CONTROL         141,IDC_STOPNGO,"Static",SS_BITMAP | WS_BORDER,50,40,11,14
+END
+
+IDD_FORMAT_ADD DIALOGEX 0, 0, 206, 73
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add Format String"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_NAME,7,24,130,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,149,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,149,24,50,14
+    LTEXT           "Enter the name of the new Format String.",IDC_STATIC,7,9,130,8
+    LTEXT           "Copy from:",IDC_STATIC,7,49,34,8
+    COMBOBOX        IDC_COMBO_FORMAT,45,45,92,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_FORMAT_PAGE DIALOGEX 0, 0, 360, 122
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Format Strings"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LISTBOX         IDC_FORMATLIST,7,18,120,76,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDT_WINDOWNAME,134,27,120,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDT_FORMATSTRING,134,55,160,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Add...",IDC_BTN_ADD,30,101,28,14
+    PUSHBUTTON      "&Delete",IDC_BTN_DELETE,79,101,28,14
+    EDITTEXT        IDC_EDT_EXAMPLE,134,81,200,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Select Format",IDC_STATIC,7,7,57,9
+    LTEXT           "Format String",IDC_STATIC,134,45,57,9,NOT WS_GROUP
+    LTEXT           "Example:",IDC_STATIC,134,72,82,9
+    LTEXT           "Window Name",IDC_STATIC,134,17,57,9,NOT WS_GROUP
+    PUSHBUTTON      "&Restore Defaults",IDC_BTN_FACTORY_DEFAULTS,134,101,66,14
+END
+
+IDD_REFERENCE_PAGE DIALOGEX 0, 0, 367, 225
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Reference Frame"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "&World Frame  (Raw device coordinates)",IDC_RDO_WORLD,
+                    "Button",BS_AUTORADIOBUTTON,14,14,180,12
+    CONTROL         "&Custom",IDC_RDO_CUSTOM,"Button",BS_AUTORADIOBUTTON,14,35,37,12
+    EDITTEXT        IDC_PT1X,135,75,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT1Y,192,75,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT1Z,248,75,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT2X,135,91,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT2Y,192,91,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT2Z,248,91,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT3X,135,107,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT3Y,192,107,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    EDITTEXT        IDC_PT3Z,248,107,42,12,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "&Reset",IDC_RESET,241,126,50,14
+    RTEXT           "X:",IDC_STATIC,125,77,8,8
+    RTEXT           "Y:",IDC_STATIC,182,77,8,8
+    RTEXT           "Z:",IDC_STATIC,238,77,8,8
+    RTEXT           "X:",IDC_STATIC,125,93,8,8
+    RTEXT           "Y:",IDC_STATIC,182,93,8,8
+    RTEXT           "Z:",IDC_STATIC,238,93,8,8
+    RTEXT           "X:",IDC_STATIC,125,109,8,8
+    RTEXT           "Y:",IDC_STATIC,182,109,8,8
+    RTEXT           "Z:",IDC_STATIC,238,109,8,8
+    LTEXT           "Press the hand switch button or right foot pedal to\nselect points that define the reference frame.",IDC_STATIC,85,51,171,18
+    GROUPBOX        "Custom Reference Frame ",IDC_STATIC,61,37,240,111
+    CONTROL         207,IDC_STOPGO,"Static",SS_BITMAP | SS_REALSIZEIMAGE | NOT WS_VISIBLE,21,186,20,18
+    LTEXT           "Origin",IDC_STATIC,85,77,21,9
+    LTEXT           "X Direction",IDC_STATIC,85,93,36,9
+    LTEXT           "Y Direction",IDC_STATIC,85,109,37,9
+    ICON            IDI_GOPOINT,IDC_ORIG,63,70,20,20
+    ICON            IDI_GOPOINT,IDC_XDIR,63,86,20,20
+    ICON            IDI_GOPOINT,IDC_YDIR,63,102,20,20
+    CONTROL         "Ind",ID_INDICATOR,"Button",BS_OWNERDRAW,214,123,20,20,0,HID_INDICATOR
+END
+
+IDD_DAISYCHAINING_PAGE DIALOGEX 0, 0, 204, 119
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Daisy Chaining"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_PT1X,69,51,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT1Y,116,51,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT1Z,162,51,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT2X,69,66,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT2Y,116,66,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT2Z,162,66,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT3X,69,81,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT3Y,116,81,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    EDITTEXT        IDC_PT3Z,162,81,32,12,ES_AUTOHSCROLL | NOT WS_TABSTOP
+    RTEXT           "X:",IDC_STATIC,59,53,8,8
+    RTEXT           "Y:",IDC_STATIC,106,53,8,8
+    RTEXT           "Z:",IDC_STATIC,152,53,8,8
+    RTEXT           "X:",IDC_STATIC,59,68,8,8
+    RTEXT           "Y:",IDC_STATIC,106,68,8,8
+    RTEXT           "Z:",IDC_STATIC,152,68,8,8
+    RTEXT           "X:",IDC_STATIC,59,83,8,8
+    RTEXT           "Y:",IDC_STATIC,106,83,8,8
+    RTEXT           "Z:",IDC_STATIC,152,83,8,8
+    CTEXT           "Press the right pedal or hand switch to select points\nthat define the daisy chaining.",IDC_STATIC,7,25,190,19
+    CONTROL         "Original Daisy Chaining",IDC_RADIO_METRIC,"Button",BS_AUTORADIOBUTTON | WS_GROUP,11,10,89,10
+    CONTROL         "Updated Daisy Chaining",IDC_RADIO_METRIC2,"Button",BS_AUTORADIOBUTTON | WS_GROUP,105,10,91,10
+    CONTROL         141,IDC_STOPNGO,"Static",SS_BITMAP | WS_BORDER,102,98,11,14
+    LTEXT           "Point 1",IDC_STATIC,27,53,24,11
+    LTEXT           "Point 2",IDC_STATIC,27,67,24,11
+    LTEXT           "Point 3",IDC_STATIC,28,81,24,11
+END
+
+IDD_MOUSEMAP_PAGE DIALOG 0, 0, 235, 103
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MicroScribe Mouse"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "&Upper Left",IDC_RDO_PT1,"Button",BS_AUTORADIOBUTTON | BS_LEFTTEXT | WS_GROUP | WS_TABSTOP,23,30,52,10
+    CONTROL         "Lower &Left",IDC_RDO_PT2,"Button",BS_AUTORADIOBUTTON | BS_LEFTTEXT | BS_NOTIFY | WS_TABSTOP,23,45,52,10
+    CONTROL         "Lower &Right",IDC_RDO_PT3,"Button",BS_AUTORADIOBUTTON | BS_LEFTTEXT | BS_NOTIFY | WS_TABSTOP,24,60,51,10
+    EDITTEXT        IDC_BOUNDARY,72,81,39,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT1X,92,29,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT1Y,137,29,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT1Z,184,29,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2X,92,44,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2Y,137,44,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2Z,184,44,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3X,92,59,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3Y,137,59,32,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3Z,184,59,32,12,ES_AUTOHSCROLL
+    RTEXT           "X:",IDC_STATIC,81,31,8,8
+    RTEXT           "Y:",IDC_STATIC,127,31,8,8
+    RTEXT           "Z:",IDC_STATIC,172,31,8,8
+    RTEXT           "X:",IDC_STATIC,81,46,8,8
+    RTEXT           "Y:",IDC_STATIC,127,46,8,8
+    RTEXT           "Z:",IDC_STATIC,172,46,8,8
+    RTEXT           "X:",IDC_STATIC,81,61,8,8
+    RTEXT           "Y:",IDC_STATIC,127,61,8,8
+    RTEXT           "Z:",IDC_STATIC,172,61,8,8
+    CTEXT           "Press the right pedal or hand switch to select points\nthat define the mouse map region.",IDC_STATIC,18,5,199,20
+    LTEXT           "Map Depth",IDC_STATIC,31,83,36,8
+    CONTROL         141,IDC_STOPNGO,"Static",SS_BITMAP | WS_BORDER,116,80,11,14
+END
+
+IDD_AUTOPLOT_PAGE DIALOG 0, 0, 202, 71
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Auto Scan"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Distance",IDC_RADIO_METRIC,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,31,44,10
+    CONTROL         "Time",IDC_RADIO_TIME,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,54,31,10
+    EDITTEXT        IDC_UNITS_DIST,56,30,40,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_UNITS_TIME,56,52,40,12,ES_AUTOHSCROLL
+    LTEXT           "units",IDC_LBL_UNITS,99,31,25,10
+    LTEXT           "ms",IDC_LBL_TIME,99,54,16,10
+    LTEXT           "Select Auto Scanning by Distance or Time",IDC_STATIC,7,15,163,14
+END
+
+IDD_INTROSCREEN DIALOGEX 0, 0, 333, 193
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MicroScribe Utility Software"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         230,IDC_STATIC_LOGO,"Static",SS_BITMAP,0,0,333,193
+    DEFPUSHBUTTON   "OK",IDOK,201,153,50,14
+    CONTROL         "Do not display this dialog in the future.",IDC_SHOWAGAIN,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,157,121,137,8
+    LTEXT           "Follow these hyperlinks to learn more about MicroScribe Utility Software, or click OK to begin using MicroScribe Utility Software.",IDC_STATIC_FOLLOW,157,24,151,27
+    LTEXT           "Introduction to MicroScribe Utility Software",IDC_HYPERLINK_INTRO,174,62,134,8
+    LTEXT           "Interface Guide",IDC_HYPERLINK_INTERFACE_GUIDE,174,79,50,8
+    LTEXT           "Troubleshooting",IDC_HYPERLINK_TROUBLE,174,96,52,8
+    LTEXT           "Welcome to MicroScribe Utility Software",IDC_STATIC_WELCOME,157,7,151,15
+END
+
+IDD_SCANPLANE_PAGE DIALOGEX 0, 0, 244, 140
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Scan Planes"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_NUMPLANES,84,99,34,12,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "&Reset",IDC_RESET,174,98,50,14
+    EDITTEXT        IDC_PT1X,69,30,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT1Y,126,30,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT1Z,182,30,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2X,69,45,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2Y,126,45,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT2Z,182,45,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3X,69,60,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3Y,126,60,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PT3Z,182,60,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STOPPTX,69,76,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STOPPTY,126,76,42,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_STOPPTZ,182,76,42,12,ES_AUTOHSCROLL
+    RTEXT           "X:",IDC_STATIC,59,32,8,8
+    RTEXT           "Y:",IDC_STATIC,116,32,8,8
+    RTEXT           "Z:",IDC_STATIC,172,32,8,8
+    RTEXT           "X:",IDC_STATIC,59,47,8,8
+    RTEXT           "Y:",IDC_STATIC,116,47,8,8
+    RTEXT           "Z:",IDC_STATIC,172,47,8,8
+    RTEXT           "X:",IDC_STATIC,59,62,8,8
+    RTEXT           "Y:",IDC_STATIC,116,62,8,8
+    RTEXT           "Z:",IDC_STATIC,172,62,8,8
+    RTEXT           "X:",IDC_STATIC,59,78,8,8
+    RTEXT           "Y:",IDC_STATIC,116,78,8,8
+    RTEXT           "Z:",IDC_STATIC,172,78,8,8
+    LTEXT           "Press the hand switch button or right pedal to\nselect points that define the scan plane and stop point.",IDC_STATIC,24,7,200,19
+    LTEXT           "&Number of planes",IDC_STATIC,24,101,56,9
+    CONTROL         207,IDC_STOPNGO,"Static",SS_BITMAP | NOT WS_VISIBLE | WS_BORDER,113,112,21,20
+    LTEXT           "Point 1",IDC_STATIC,24,33,23,8
+    LTEXT           "Point 2",IDC_STATIC,24,48,23,8
+    LTEXT           "Point 3",IDC_STATIC,24,63,23,8
+    LTEXT           "Stop Point",IDC_STATIC,24,78,33,8
+    ICON            IDI_GOPOINT,IDC_POINT1,2,27,20,20
+    ICON            IDI_GOPOINT,IDC_POINT2,2,41,20,20
+    ICON            IDI_GOPOINT,IDC_POINT3,1,56,20,20
+    ICON            IDI_GOPOINT,IDC_STOPPOINT,2,72,20,20
+    CONTROL         "Ind",ID_INDICATOR,"Button",BS_OWNERDRAW,147,95,20,20,0,HID_INDICATOR
+END
+
+IDD_INSCRIBE3_DIALOG DIALOGEX 0, 0, 360, 60
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "MicroScribe Utility Software"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "&Format Output",ID_FORMATOUTPUT,"Button",BS_OWNERDRAW | WS_TABSTOP,4,3,20,20,0,HID_FORMATOUTPUT
+    CONTROL         "&Reference Frame",ID_REFERENCEFRAME,"Button",BS_OWNERDRAW | WS_TABSTOP,24,3,20,20,0,HID_REFERENCEFRAME
+    CONTROL         "&Auto Plot",ID_AUTOPLOT,"Button",BS_OWNERDRAW | WS_TABSTOP,44,3,20,20,0,HID_AUTOPLOT
+    CONTROL         "Scan &Planes",ID_CUTTINGPLANE,"Button",BS_OWNERDRAW | WS_TABSTOP,64,3,20,20,0,HID_CUTTINGPLANE
+    CONTROL         "&Config",ID_CONFIG,"Button",BS_OWNERDRAW | WS_TABSTOP,84,3,20,20,0,HID_CONFIG
+    CONTROL         "Custom Tip",ID_CUSTOMTIP_CALIB,"Button",BS_OWNERDRAW | WS_TABSTOP,104,3,20,20
+    CONTROL         "MicroScribe &Info",ID_MSINFO,"Button",BS_OWNERDRAW | WS_TABSTOP,124,3,20,20,0,HID_MSINFO
+    CONTROL         "MicroScribe &Help",ID_MSHELP,"Button",BS_OWNERDRAW | WS_TABSTOP,144,3,20,20,0,HID_MSHELP
+    CONTROL         "On &Top",IDC_CHK_ONTOP,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,320,31,37,11
+    CONTROL         "Auto Scan",IDC_CHK_AUTOPLOT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,46,47,11
+    CONTROL         "Scan Planes",IDC_CHK_SCANPLANES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,46,53,11
+    LTEXT           "X",IDC_STATIC_X,4,26,14,18
+    LTEXT           "<XVal><>",IDC_CURX,22,26,80,18
+    LTEXT           "Y",IDC_STATIC_Y,110,26,14,18
+    LTEXT           "<YVal><>",IDC_CURY,128,26,80,18
+    LTEXT           "Z",IDC_STATIC_Z,216,26,14,18
+    LTEXT           "<ZVal><>",IDC_CURZ,234,26,80,18
+    LTEXT           "",IDC_STATIC_CONNECTED,169,8,160,10,NOT WS_VISIBLE
+    LTEXT           "Format",IDC_STATIC,121,46,23,11,SS_CENTERIMAGE
+    LTEXT           "Notepad",IDC_APP,147,46,72,11,SS_CENTERIMAGE | SS_SUNKEN
+    LTEXT           "Tip",IDC_STATIC,227,46,11,11,SS_CENTERIMAGE
+    LTEXT           "Default",IDC_NEW_TIPNAME,243,46,114,11,SS_CENTERIMAGE | SS_SUNKEN
+    CONTROL         206,IDC_ARM_IND_ACTIVE,"Static",SS_BITMAP | SS_REALSIZEIMAGE | NOT WS_VISIBLE | WS_DISABLED,337,3,20,18
+    CONTROL         207,IDC_ARM_IND_ERROR,"Static",SS_BITMAP | SS_REALSIZEIMAGE | NOT WS_VISIBLE | WS_DISABLED,337,3,20,18
+    CONTROL         "Ind",ID_INDICATOR,"Button",BS_OWNERDRAW | WS_TABSTOP,337,3,20,20,0,HID_INDICATOR
+END
+
+IDD_MICROSCRIBE DIALOG 0, 0, 137, 27
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Microscribe Window"
+FONT 8, "MS Sans Serif"
+BEGIN
+END
+
+IDD_CONFIG_PAGE DIALOGEX 0, 0, 249, 154
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Configuration"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "Use &scaling factor",IDC_CHECK_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,130,20,73,10
+    EDITTEXT        IDC_EDIT_SCALING,141,32,40,14,ES_AUTOHSCROLL
+    CONTROL         "&Metric (mm)",IDC_RADIO_METRIC,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,20,52,10
+    CONTROL         "&Standard (inches)",IDC_RADIO_STANDARD,"Button",BS_AUTORADIOBUTTON,14,33,71,10
+    GROUPBOX        "Units",IDC_STATIC,9,7,98,42
+    CONTROL         "&Beep on plot",IDC_CHK_BEEPONPLOT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,110,56,10
+    CONTROL         "Use &comma as decimal",IDC_CHK_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,66,89,10
+    CONTROL         "On &Top",IDC_CHK_ONTOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,79,40,10
+    GROUPBOX        "Scale",IDC_STATIC,125,7,98,42
+    GROUPBOX        "Display",IDC_STATIC,9,53,98,42
+    GROUPBOX        "Sound",IDC_STATIC,9,97,98,42
+    GROUPBOX        "Trigger Button",IDC_STATIC,125,53,98,42
+    CONTROL         "Button &1",IDC_RADIO_BTN1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,130,66,43,10
+    CONTROL         "Button &2",IDC_RADIO_BTN2,"Button",BS_AUTORADIOBUTTON,130,79,43,10
+END
+
+IDD_INFO_PAGE DIALOGEX 0, 0, 350, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MicroScribe Information"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Information and Status",IDC_STATIC,8,7,72,8
+    PUSHBUTTON      "About",IDC_ABOUT,185,98,59,15
+    LTEXT           "Connection",IDC_STATIC,8,20,57,8
+    EDITTEXT        IDC_CONNECTION,82,17,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Product Name",IDC_STATIC,8,33,57,8
+    EDITTEXT        IDC_PRODUCT_NAME,82,30,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Model Name",IDC_STATIC,8,46,57,8
+    EDITTEXT        IDC_MODEL_NAME,82,43,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Serial Number",IDC_STATIC,8,59,57,8
+    EDITTEXT        IDC_SERIAL_NUMBER,82,56,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Device ID",IDC_STATIC,8,72,57,8
+    EDITTEXT        IDC_DEVICE_ID,82,69,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Update Time",IDC_STATIC,8,85,57,8
+    EDITTEXT        IDC_UPDATE_TIME,82,82,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Firmware Version",IDC_STATIC,8,98,57,8
+    EDITTEXT        IDC_FIRMWARE_VERSION,82,95,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Driver Version",IDC_STATIC,8,111,57,8
+    EDITTEXT        IDC_SOFTWARE_VERSION,82,108,65,12,ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "",IDC_LOGO_FRAME,"Button",BS_OWNERDRAW | NOT WS_VISIBLE | WS_DISABLED,259,81,70,55,WS_EX_TRANSPARENT
+    LTEXT           "www.revware.net",IDC_IMMR_URL,187,81,60,13
+    CONTROL         229,IDC_STATIC,"Static",SS_BITMAP,183,17,151,54
+END
+
+IDD_CUSTOMTIP_PAGE DIALOGEX 0, 0, 430, 290
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Custom Tip"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Use Default Tip",IDC_DEFAULT_TIP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,16,13,62,10
+    CONTROL         "Use Fixed z- Offset from Default Tip",IDC_FIXED_OFFSET,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,16,28,132,10
+    CONTROL         "Use  Custom Tip",IDC_STORED_TIP,"Button",BS_AUTORADIOBUTTON | WS_GROUP,16,51,87,10
+    EDITTEXT        IDC_EDIT_OFFSET,153,26,106,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_TIPNAME,153,50,106,55,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_TIPNAME,243,104,94,14
+    LTEXT           "Step 2 of 5: Place in home position with Default Tip",IDC_STEP1,53,125,176,8
+    LTEXT           "and place in home position",IDC_STEP2A,91,152,116,8
+    GROUPBOX        "Custom Tip Properties",IDC_SWITCH_TIPS,11,87,339,164
+    PUSHBUTTON      "Done",IDC_DONE_SWITCH,243,144,94,14
+    LTEXT           "Step 4 of 5: Collect 20 points on calibration fixture ",IDC_STEP3,53,167,178,8
+    LTEXT           "Step 5 of 5: Save custom tip properties",IDC_STEP4,53,219,115,8
+    CONTROL         "Progress1",IDC_PROGRESS_PTS,"msctls_progress32",WS_BORDER,53,182,185,14
+    PUSHBUTTON      "Save Custom Tip Definition",IDC_SAVE_ALL,243,215,94,14
+    CONTROL         "Define/Overwrite",IDC_REDEFINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,265,49,86,12
+    LTEXT           "Step 1 of 5: Name custom tip",IDC_STEP0,53,107,112,8
+    LTEXT           "mm  ",IDC_UNITS,266,29,41,8
+    LTEXT           "Step 3 of 5: Switch to the custom tip ",IDC_STEP2,53,143,118,8
+    PUSHBUTTON      "Done",IDC_DONE_HOME,243,123,94,14
+    ICON            IDI_GOPOINT,IDC_CHECK2,27,121,20,20,NOT WS_VISIBLE
+    ICON            IDI_GOPOINT,IDC_CHECK3,27,141,20,20,NOT WS_VISIBLE
+    ICON            IDI_GOPOINT,IDC_CHECK4,25,161,20,20,NOT WS_VISIBLE
+    ICON            IDI_GOPOINT,IDC_CHECK5,27,212,20,20,NOT WS_VISIBLE
+    ICON            IDI_GOPOINT,IDC_CHECK1,27,100,20,20,NOT WS_VISIBLE
+    PUSHBUTTON      "Restart Point Collection",IDC_RESET_PTS,243,165,94,14
+    LTEXT           "<XVal><>",IDC_X_VAL,85,232,45,8
+    LTEXT           "<YVal><>",IDC_Y_VAL,173,232,45,8
+    LTEXT           "<ZVal><>",IDC_Z_VAL,261,232,45,8
+    RTEXT           "X Offset:",IDC_OFFSET_X,53,232,28,8
+    RTEXT           "Y Offset:",IDC_OFFSET_Y,141,232,28,8
+    RTEXT           "Z Offset:",IDC_OFFSET_Z,229,232,28,8
+    CONTROL         "Manual <x,y,z> offset",IDC_ENTER_XYZ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,265,68,107,12
+    RTEXT           "X Offset:",IDC_OFFSET_X2,53,199,28,8
+    RTEXT           "Y Offset:",IDC_OFFSET_Y2,141,200,28,8
+    RTEXT           "Z Offset:",IDC_OFFSET_Z2,229,200,28,8
+    EDITTEXT        IDC_EDIT_X,85,197,45,14
+    EDITTEXT        IDC_EDIT_Y,173,197,45,14
+    EDITTEXT        IDC_EDIT_Z,261,197,43,14
+    LTEXT           "(Requires homing with default tip at power-up)",IDC_WARNING,27,38,160,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 6,0,1,0
+ PRODUCTVERSION 6,0,1,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Revware, Inc."
+            VALUE "FileDescription", "MicroScribe Utility Software"
+            VALUE "FileVersion", "6.0.1.0"
+            VALUE "LegalCopyright", "Copyright (C) 1993-2011 Revware, Inc."
+            VALUE "OriginalFilename", "MScribeUtility.exe"
+            VALUE "ProductName", "MicroScribe Utility Software"
+            VALUE "ProductVersion", "6.0.1.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+    END
+
+    IDD_CONNECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 118
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 54
+    END
+
+    IDD_FORMAT_ADD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 199
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 66
+    END
+
+    IDD_FORMAT_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 353
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_REFERENCE_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 360
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 218
+    END
+
+    IDD_DAISYCHAINING_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 197
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 112
+    END
+
+    IDD_MOUSEMAP_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
+    END
+
+    IDD_AUTOPLOT_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 195
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 64
+    END
+
+    IDD_INTROSCREEN, DIALOG
+    BEGIN
+    END
+
+    IDD_SCANPLANE_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 237
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 133
+    END
+
+    IDD_INSCRIBE3_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 1
+        RIGHTMARGIN, 357
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 57
+    END
+
+    IDD_MICROSCRIBE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 130
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 20
+    END
+
+    IDD_CONFIG_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 242
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 147
+    END
+
+    IDD_INFO_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 343
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+
+    IDD_CUSTOMTIP_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 421
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 280
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_GO                  BITMAP                  "res\\go.bmp"
+IDB_STOP                BITMAP                  "res\\stop.bmp"
+IDB_MSMOUSE             BITMAP                  "res\\msmouse.bmp"
+IDB_FORMATSTRING        BITMAP                  "res\\formatstring.bmp"
+IDB_CONNECT             BITMAP                  "res\\msconnect.bmp"
+IDB_MSINFO              BITMAP                  "res\\msinfo.bmp"
+IDB_CUTTINGPLANE        BITMAP                  "res\\cuttingplane.bmp"
+IDB_DISCONNECT          BITMAP                  "res\\msdisconnect.bmp"
+IDB_REFERENCEFRAME      BITMAP                  "res\\define-ref-frame.bmp"
+IDB_MSMOUSE_DISABLED    BITMAP                  "res\\ms-mouse-d.bmp"
+IDB_MSHELP              BITMAP                  "res\\mshelp.bmp"
+IDB_AUTOPLOT            BITMAP                  "res\\autoplot.bmp"
+IDB_REVWARE             BITMAP                  "res\\RevwareLogo.bmp"
+IDB_CONFIG              BITMAP                  "res\\configure.bmp"
+IDB_CUSTOMTIP           BITMAP                  "res\\tipcalib.bmp"
+IDB_ARM_IND_ACTIVE      BITMAP                  "res\\ind_active.bmp"
+IDB_ARM_IND_ERROR       BITMAP                  "res\\ind_error.bmp"
+IDB_REVWARE1            BITMAP                  "res\\revware1.bmp"
+IDB_LOGOMAIN            BITMAP                  "res\\LogoMain.bmp"
+IDB_MSHELPH             BITMAP                  "res\\mshelph.bmp"
+IDB_MSHELPD             BITMAP                  "res\\mshelpD.bmp"
+IDB_AUTOPLOTH           BITMAP                  "res\\autoploth.bmp"
+IDB_AUTOPLOTD           BITMAP                  "res\\autoplotd.bmp"
+IDB_CONFIGH             BITMAP                  "res\\configureH.bmp"
+IDB_CONFIGD             BITMAP                  "res\\configureD.bmp"
+IDB_CUSTOMTIPD          BITMAP                  "res\\tipcalibD.bmp"
+IDB_CUSTOMTIPH          BITMAP                  "res\\tipcalibH.bmp"
+IDB_CUTTINGPLANED       BITMAP                  "res\\cuttingplaneD.bmp"
+IDB_CUTTINGPLANEH       BITMAP                  "res\\cuttingplaneH.bmp"
+IDB_FORMATSTRINGD       BITMAP                  "res\\formatstringD.bmp"
+IDB_FORMATSTRINGH       BITMAP                  "res\\formatstringH.bmp"
+IDB_MSINFOH             BITMAP                  "res\\msinfoH.bmp"
+IDB_MSINFOD             BITMAP                  "res\\msinfoD.bmp"
+IDB_REFERENCEFRAMEH     BITMAP                  "res\\define-ref-frameH.bmp"
+IDB_REFERENCEFRAMED     BITMAP                  "res\\define-ref-frameD.bmp"
+IDB_ARM_IND_INACTIVE    BITMAP                  "res\\ind_inactive.bmp"
+IDB_ARM_IND_HOLD        BITMAP                  "res\\ind_hold.bmp"
+IDB_MUSSTAMP            BITMAP                  "res\\MUSstamp.bmp"
+IDB_INTRO_BACKGROUND    BITMAP                  "res\\MUSintro24b.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "&About MicroScribe Utility Software..."
+    IDS_ALWAYSONTOP         "Always On &Top"
+    IDS_MNU_DIAGNOSTICS     "&MicroScribe Info..."
+    IDS_MNU_INTRO           "MicroScribe Utility Software &Welcome..."
+    IDS_CAP_BADPLANENUM     "Invalid Number of Planes"
+    IDS_CAP_STRINGDEL       "Delete Format String"
+    IDS_CAP_CONFIRM_RESTORE "Restore Defaults"
+    IDS_CAP_SAVE_CHANGES    "Save Changes?"
+    IDS_CAP_MUS             "MicroScribe Utility Software"
+    IDS_CAP_MUSCONFIG       "MicroScribe Utility Software Configuration"
+    IDS_CAP_DISCONNECT      "&Disconnect"
+END
+
+STRINGTABLE
+BEGIN
+    ID_MSINFO               "MicroScribe Info"
+    ID_FORMATOUTPUT         "Format Strings"
+    ID_CUTTINGPLANE         "Scan Planes"
+    ID_REFERENCEFRAME       "Reference Frame"
+    ID_AUTOPLOT             "Auto Scan"
+    ID_MSHELP               "MicroScribe Utility Software Help"
+    ID_CONFIG               "Configuration"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CUSTOMTIP_CALIB      "Custom Tip"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERR_CONNECT         "MicroScribe connect error."
+    IDS_ERR_OUTOFMEM        "The operating system is out\nof memory or resources."
+    IDS_ERR_NOPATH          "The specified path was not found."
+    IDS_ERR_NOFILE          "The specified file was not found."
+    IDS_ERR_BADEXE          "The .EXE file is invalid\n(non-Win32 .EXE or error in .EXE image)."
+    IDS_ERR_ACCESSDENIED    "The operating system denied\naccess to the specified file."
+    IDS_ERR_ASSOCINCOMPLETE "The filename association is\nincomplete or invalid."
+    IDS_ERR_DDEBUSY         "The DDE transaction could not\nbe completed because other DDE transactions\nwere being processed."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MSG_BADPLANENUM     "The number of cutting planes must be two (2) or greater.\nMicroScribe Utility Software has automatically set this to be two (2)."
+    IDS_MSG_1STRINGREQ      "You must have at least one Format String!"
+    IDS_MSG_CONFIRM_STRDEL  "Are you sure you want to delete this Format String?"
+    IDS_MSG_CONFIRM_RESTORE "Are you sure you want to restore the defaults?\nThis will remove all added format strings!"
+    IDS_MSG_SAVE_STR_CHANGES 
+                            "Do you want to save changes to this Format String?"
+    IDS_MSG_OFFSETNOTDEFINED 
+                            "Your custom tip offsets have not been defined. \nPress OK to continue to define your tip \nor CANCEL to go back to the Default Tip."
+    IDS_MSG_HOMEDEFAULT     "Place the device in home position with the Default tip \nand press the Home button before acquiring data."
+    IDS_MSG_REPLACE_DEFAULTTIP 
+                            "Please replace the currently installed tip with the Default Tip.\nPress OK once you have installed the Default Tip.\nPress Cancel to continue using the currently installed tip."
+    IDS_MSG_POINTS_TOOCLOSE "Calibration points or angles too close to one another. Press OK to accept 0 offsets, Cancel to go back to Default Tip."
+    IDS_MSG_CALIB_INCOMPLETE 
+                            "Calibration incomplete. Please collect 20 additional points."
+    IDS_MSG_ATTACH_CUSTOMTIP 
+                            "Place the device in home position with %s tip\nand press the Home button before acquiring data."
+    IDS_MSG_CALIB_STEP1OF1_A "Step 1 of 1: Switch to your default tip."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERR_DDEFAIL         "The DDE transaction failed."
+    IDS_ERR_DDETIMEOUT      "The DDE transaction could not\nbe completed because the request timed out."
+    IDS_ERR_DLLNOTFOUND     "The specified dynamic-link library was not found."
+    IDS_ERR_NOASSOC         "There is no application associated\nwith the given filename extension."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERR_OOM             "There was not enough memory to complete the operation."
+    IDS_ERR_SHARE           "A sharing violation occurred."
+    IDS_ERR_UNKNOWN         "Unknown Error (%d) occurred."
+    IDS_ERR_HYPERLINK       "Unable to open hyperlink:\n\n"
+    IDS_ERR_TIPSET          "New tip has not been set properly."
+    IDS_ERR_ENTEROFFSETS    "Enter your offsets first, then press Save."
+    IDS_ERR_TIPNOTSAVED     "New tip has not been saved properly."
+    IDS_ERR_THREAD_CREATEFAILED 
+                            "The creation of a communications thread failed."
+    IDS_ERR_MSGREGFAILED    "Unable to register Microscribe window message\n"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_MSG_CALIB_STEP1OF1_B "Step 1 of 1: Switch to your custom tip."
+    IDS_MSG_CALIB_STEP3OF5  "Step 3 of 5: Switch to your custom tip."
+    IDS_MSG_CALIB_STEP4OF5  "Step 4 of 5: Enter the known offsets."
+    IDS_MSG_CALIB_SWITCHTIP "Complete these steps to switch your tip."
+    IDS_MSG_CALIB_DEFINETIP "Complete these steps to define your tip."
+    IDS_MSG_DISCONNECT      "Do you really want to disconnect from the MicroScribe?"
+    IDS_MSG_RECONNECT       "The device was manually disconnected. Do you want to reconnect?"
+    IDS_MSG_MSNOTCONNECTED  "MicroScribe not connected"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERR_WINNOTCREATED   "MicroScribe Window was not created."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CAP_CONNECT         "&Connect"
+    IDS_CAP_BLANKFORMATSTR  "<blank Format String>"
+    IDS_CAP_FORMATSTRINGS   "Format Strings"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "afxres.rc"         //Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
