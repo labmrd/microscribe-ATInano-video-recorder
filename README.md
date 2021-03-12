@@ -1,9 +1,9 @@
-# microscribe-ATInano-video-recorder  MAVrec
+# microscribe-ATInano-video-recorder"  "MAVrec"
 
-This project creates a processing.org sketch to  to record  and syncronize data from the following sources simultaneously:
+This project creates a processing.org sketch to record and syncronize data from the following sources simultaneously:
 * 0, 1 or 2 usb cameras or similar video sources; dumping to separate mp4 files (no audio) 
-* a usb-serial source such as Teensy 3.6, 4.0, or 4.1 which extracts data from the devices below and dumps it to serial to the program
-* MicroScribe M or MX 6DoF (Microscribe plugs directly into Teensy USB host port, extracts usb packets, does timing sync, and forwards them to serial. Note this is only raw encoder readings and the arm kinematic link DH parameters needed to map them to Cartesian pose
+* a usb-serial source such as Teensy 3.6, 4.0, or 4.1 which extracts data from the devices below and dumps it to serial which the sketch dumps to a _data.txt file.
+* MicroScribe M or MX 6DoF (Microscribe plugs directly into Teensy USB host port, extracts usb packets, does timing sync, and forwards them to serial. Note this is only raw encoder readings and the arm kinematic link DH parameters needed to map them to Cartesian pose; not the Cartesian x,y,z,roll,pitch,yaw available from the microscribe windows utility (MUS).
 * ATI Nano17 or similar running on an ATI 9105-NETCANOEM board which forwards the extracted Fx, Fy,Fz, Tx, Ty, Tz forces as compensated by factory settings. 
 
 
