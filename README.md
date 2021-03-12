@@ -1,4 +1,4 @@
-# microscribe-ATInano-video-recorder"  "MAVrec"
+# microscribe-ATInano-video-recorder:  "MAVrec"
 
 This project creates a processing.org sketch to record and syncronize data from the following sources simultaneously:
 * 0, 1 or 2 usb cameras or similar video sources; dumping to separate mp4 files (no audio) 
