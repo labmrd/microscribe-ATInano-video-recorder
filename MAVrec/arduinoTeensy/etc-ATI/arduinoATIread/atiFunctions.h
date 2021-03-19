@@ -29,6 +29,17 @@ unsigned char inBuffer[ 13 ];    // ATI streaming message length is 13 bytes
 char 		  tempBuffer[512];   // temporary space for reading in holding registers, usually converted to strings
 unsigned long t, t0;  // time keeping variables [us]
 
+String sCalibSerialNumber, sCalibPartNumber, sCalibFamilyId, sCalibTime, sForceUnits, sTorqueUnits; 
+  
+float BasicMatrix[6][6];
+unsigned ForceUnitsCode;
+unsigned TorqueUnitsCode;
+float MaxRating[6];
+int CountsPerForce;
+int CountsPerTorque;
+unsigned int GageGain[6];
+unsigned int GageOffset[6];
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper Functions:
@@ -373,16 +384,6 @@ void ATIreadHoldingRegister( unsigned short addr , unsigned short numPointsToRea
 bool ATIinitialize( void ){
 
   ATIcalibrationBanner = "%% ATI Sensor not initialized; Calibration & units unknown. ";
-  String sCalibSerialNumber, sCalibPartNumber, sCalibFamilyId, sCalibTime; 
-  
-  float BasicMatrix[6][6];
-  unsigned ForceUnits;
-  unsigned TorqueUnits;
-  float MaxRating[6];
-  int CountsPerForce;
-  int CountsPerTorque;
-  unsigned int GageGain[6];
-  unsigned int GageOffset[6];
   
   //  Read the calibration information in the calibration table labeled calibrationNum;   
   //  assumes no tool transformations in the "active calibration matrix"
@@ -406,32 +407,29 @@ bool ATIinitialize( void ){
   //  uint8 UserField2[16];
   //  uint8 SpareData[16];
   // The code below will attempt to read the desired fields above.
-  
-
-  
+    
   //  uint8 CalibSerialNumber[8], 
-  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR, 8/2);  
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR, 8/2);  // divide by two bc each register point is 2 bytes (16bit)
   sCalibSerialNumber =  tempBuffer ;
-  Serial.print("sCalibSerialNumber = ");  Serial.println( sCalibSerialNumber );
+  // Serial.print("sCalibSerialNumber = ");  Serial.println( sCalibSerialNumber );
   
   //  uint8 CalibPartNumber[32];
-  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8)/2, 32/2);  
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8)/2, 32/2);  // add previous read size to offset
   sCalibPartNumber = tempBuffer ;
   
   //  uint8 CalibFamilyId[4];
-  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32)/2, 4/2);  
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32)/2, 4/2);  // add previous read size to offset
   sCalibFamilyId = tempBuffer ;
   
   //  uint8 CalibTime[20];
-  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR +(8+32+4)/2, 20/2);  
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR +(8+32+4)/2, 20/2);  // add previous read size to offset
   sCalibTime = tempBuffer ;
 
-  ATIcalibrationBanner = "% ATI_CalibSerialNumber = " + sCalibSerialNumber + "\r\n" +
-						 "% ATI_CalibPartNumber = " + sCalibPartNumber + "\r\n" +
-						 "% ATI_CalibFamilyId = " + sCalibFamilyId + "\r\n" + 
-						 "% ATI_CalibTime = " + sCalibTime + "\r\n" + 
-						 "% \r\n";
-  Serial.println( ATIcalibrationBanner );  
+  ATIcalibrationBanner = "% ATI_CalibSerialNumber = '" + sCalibSerialNumber + "';\r\n" +
+						 "% ATI_CalibPartNumber = '" + sCalibPartNumber + "';\r\n" +
+						 "% ATI_CalibFamilyId = '" + sCalibFamilyId + "';\r\n" + 
+						 "% ATI_CalibTime = '" + sCalibTime + "';\r\n" ;
+  //Serial.println( ATIcalibrationBanner );  
   
   //  float BasicMatrix[6][6]; // have to read in 6 floats at a time due to MODBUS length restrictions
   float f,f2 = 0;
@@ -469,12 +467,124 @@ bool ATIinitialize( void ){
 		//Serial.print( j + i*6 + 3*(j+i*6)  ) ; Serial.print( ", " )		;	
 		
 		//Serial.print( " \t ");
-		Serial.print( BasicMatrix[i][j] ); Serial.print( "\t  " )		;
+		//Serial.print( BasicMatrix[i][j] ); Serial.print( "\t  " )		;
 		
 		//Serial.print( "  f = " ); Serial.println( f );  Serial.print( "  f2 = " ); Serial.println( f2 ); 
 	}
-	Serial.println();
+	//Serial.println();
   }
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_BasicMatrix = [\r\n";
+  char f_str[32];
+  for (int i = 0; i<6; i++) 
+  {		
+	ATIcalibrationBanner = ATIcalibrationBanner +"%\t";
+	for (int j = 0; j < 6; j++)
+	{
+		dtostrf( BasicMatrix[i][j], 10, 4, f_str);  // min width, precision
+		ATIcalibrationBanner = ATIcalibrationBanner + f_str + "\t" ;
+	}
+	ATIcalibrationBanner = ATIcalibrationBanner +"\r\n";
+  }  
+  ATIcalibrationBanner = ATIcalibrationBanner + "%                   ]; \r\n";
+  
+  
+  //  uint8 ForceUnits; ...code is a numeric val, e.g. 1 --> Pounds, 2-->Newtons 
+  //  uint8 TorqueUnits;
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+6*6*4)/2,  2/2); 
+  ForceUnitsCode = (unsigned char) tempBuffer[0];
+  TorqueUnitsCode = (unsigned char) tempBuffer[1];
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_ForceUnitsCode = " + String( ForceUnitsCode ) + ";\r\n";  
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_TorqueUnitsCode = " + String( TorqueUnitsCode ) + ";\r\n";
+  switch ( ForceUnitsCode ) 
+  {
+	case 1:  sForceUnits = "Pounds"	 	 ; break;
+	case 2:  sForceUnits = "Newtons" 	 ; break;
+	case 3:  sForceUnits = "KiloPounds"	 ; break;
+	case 4:  sForceUnits = "KiloNewtons" ; break;
+	case 5:  sForceUnits = "Kg-force"	 ; break;
+	case 6:  sForceUnits = "grams-force" ; break;	
+	default: sForceUnits = "UNKNOWN"     ; break;
+  }
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_ForceUnits = '" + sForceUnits + "';\r\n";
+  switch ( TorqueUnitsCode ) 
+  {
+	case 1:  sTorqueUnits = "Pound-inch"	  	; break;
+	case 2:  sTorqueUnits = "Pound-foot" 	 	; break;
+	case 3:  sTorqueUnits = "Newton-meters"	 	; break;
+	case 4:  sTorqueUnits = "Newton-millimeters"; break;
+	case 5:  sTorqueUnits = "Kg-cm"	 			; break;
+	case 6:  sTorqueUnits = "KN-m" 				; break;	
+	default: sTorqueUnits = "UNKNOWN"     		; break;
+  }
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_TorqueUnits = '" + sTorqueUnits + "';\r\n";
+  
+  //  float MaxRating[6];
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+6*6*4+2)/2,  4*6/2); 
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_MaxRating = [    ";
+  for (int j = 0; j < 6; j++)
+  {		
+	charArry[3] = tempBuffer[ j*4 + 0 ];
+	charArry[2] = tempBuffer[ j*4 + 1 ];
+	charArry[1] = tempBuffer[ j*4 + 2 ];
+	charArry[0] = tempBuffer[ j*4 + 3 ];		
+	memcpy( &f2, charArry, sizeof(float));
+	MaxRating[j] = f2;
+	dtostrf(MaxRating[j], 4, 1, f_str);  // min width, precision
+	ATIcalibrationBanner = ATIcalibrationBanner + f_str + "\t"; 
+  }
+  ATIcalibrationBanner = ATIcalibrationBanner +" ];\r\n";
+  
+  
+  //  int32 CountsPerForce;
+  //  int32 CountsPerTorque;
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+6*6*4+2+4*6)/2,  4*2/2);   
+  charArry[3] = tempBuffer[ 0 ];
+  charArry[2] = tempBuffer[ 1 ];
+  charArry[1] = tempBuffer[ 2 ];
+  charArry[0] = tempBuffer[ 3 ];		
+  memcpy( &CountsPerForce, charArry, sizeof(CountsPerForce) );
+  charArry[3] = tempBuffer[ 4 ];
+  charArry[2] = tempBuffer[ 5 ];
+  charArry[1] = tempBuffer[ 6 ];
+  charArry[0] = tempBuffer[ 7 ];		
+  memcpy( &CountsPerTorque, charArry, sizeof(CountsPerTorque) );  
+  
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_CountsPerForce  = " + String( CountsPerForce) + "\r\n";
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_CountsPerTorque = " + String(CountsPerTorque) + "\r\n";
+  
+  // uint16 GageGain[6];
+  // uint16 GageOffset[6];
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+6*6*4+2+4*6+4*2)/2,  6*2/2); 
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_GageGain = [    ";
+  for (int j = 0; j < 6; j++)
+  {		
+	unsigned short u16;
+	charArry[1] = tempBuffer[ j*2 + 0 ];
+	charArry[0] = tempBuffer[ j*2 + 1 ];		
+	memcpy( &u16, charArry, sizeof(u16));
+	GageGain[j] = u16;	
+	ATIcalibrationBanner = ATIcalibrationBanner + String( u16 ) + "\t"; 
+/* 	Serial.println( tempBuffer[ j*2 + 0 ], HEX);
+	Serial.println( tempBuffer[ j*2 + 1 ], HEX);
+	Serial.println( u16, HEX); */
+  }
+  ATIcalibrationBanner = ATIcalibrationBanner +" ] \r\n";
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+6*6*4+2+4*6+4*2+6*2)/2,  6*2/2); 
+  ATIcalibrationBanner = ATIcalibrationBanner + "% ATI_GageOffset = [    ";
+  for (int j = 0; j < 6; j++)
+  {		
+	unsigned short u16;
+	charArry[1] = tempBuffer[ j*2 + 0 ];
+	charArry[0] = tempBuffer[ j*2 + 1 ];		
+	memcpy( &u16, charArry, sizeof(u16));
+	GageOffset[j] = u16;	
+	ATIcalibrationBanner = ATIcalibrationBanner + u16 + "\t"; 
+  }
+  ATIcalibrationBanner = ATIcalibrationBanner +" ] \r\n";
+  
+    
+  
+  Serial.println( ATIcalibrationBanner );  
   ///////////////////////////////////////////////////////////////////////////////////////
   //  send "Unlock Storage command" to unlock active gain and offset hardware settings
   ///////////////////////////////////////////////////////////////////////////////////////
