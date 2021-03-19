@@ -10,9 +10,9 @@
 #define HWSERIAL    Serial1
 #define ATI_BAUD    1250000
 #define TIMEOUT_US  200000  // after ~100 ms, stop waiting to hear from ATI
-#define ATI_CALIBRATION_ADDR_HI 0x00  // address of calibration # to load from netcanoem's 
-#define ATI_CALIBRATION_ADDR_LO 0xe3  // internal list (should match sensor Part #)                                      
-                                      // see pg 2 of Digital FT Modbus Interface.pdf doc
+#define ATI_CALIBRATION_ADDR 0x00E3 // address of calibration # to load from netcanoem's 
+									// internal list (should match sensor Part #)                                      
+                                    // see pg 2 of Digital FT Modbus Interface.pdf doc
 #include "atiFunctions.h"
 
 

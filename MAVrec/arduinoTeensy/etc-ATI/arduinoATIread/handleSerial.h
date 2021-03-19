@@ -24,9 +24,9 @@ void handleSerialInput ( unsigned char incomingByte ) {
     case 'i':
     case 'I':
       Serial.println("initializing ATI netCANoem board ... "); 
-      
+      bool st = ATIinitialize();
       Serial.print("  return status = "); 
-      Serial.println( ATIinitialize() );
+      Serial.println( st );
       /*
       Serial.print("  status = ");
       if( ATIgetStatus() == 0 )

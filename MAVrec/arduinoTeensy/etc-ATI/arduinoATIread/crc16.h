@@ -1,4 +1,4 @@
-//  MODBUS CRC 16 algorithm extratex from PI-MBUS-300 document
+//  MODBUS CRC 16 algorithm extrated from PI-MBUS-300 document
 //    The function takes two arguments:
 //    unsigned char *puchMsg ; A pointer to the message buffer containing
 //    binary data to be used for generating the CRC
@@ -63,7 +63,8 @@ unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
   {
     uIndex   = uchCRCHi ^ *puchMsg++ ; /* calculate the CRC */
     uchCRCHi = uchCRCLo ^ auchCRCHi[uIndex];
+	uchCRCLo = auchCRCLo[uIndex] ;
   } ;
-  uchCRCLo = auchCRCLo[uIndex] ;
+  
   return (uchCRCHi << 8 | uchCRCLo) ;  
 }

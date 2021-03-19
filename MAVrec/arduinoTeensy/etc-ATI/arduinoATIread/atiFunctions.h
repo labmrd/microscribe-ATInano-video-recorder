@@ -26,7 +26,9 @@ String ATIcalibrationBanner = "% ATI Sensor not initialized; Calibration & units
 // Internal book-keeping
 unsigned char incomingByte;      // book-keeping
 unsigned char inBuffer[ 13 ];    // ATI streaming message length is 13 bytes
+char 		  tempBuffer[512];   // temporary space for reading in holding registers, usually converted to strings
 unsigned long t, t0;  // time keeping variables [us]
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper Functions:
@@ -41,6 +43,9 @@ bool ATIstartStreaming( void );
 // sends the jamming sequence (any 14-byte or longer command) to stop streaming
 // assumes streaming is already occuring.
 void ATIstopStreaming( void );
+
+// helper function to read from holding registers (e.g. calibration values) via MODBUS
+void ATIreadHoldingRegister( unsigned char addrHi,  unsigned char addrLo, unsigned short numBytes);
 
 // Reads the calibration information in the calibration table labeled calibrationNum; 
 //  default is Calibration 1 --> calibrationNum = 1 
@@ -78,11 +83,11 @@ unsigned char atiStreamDataCommand[ cmdLengthStream ] = {
 unsigned char atiJammingCommand [ cmdLengthJam ] = {
   0xFF  //any command 14 bytes or longer will do
 };
-unsigned char atiReadCalibration[ cmdLengthStatus ] = { // same length as get status command
+unsigned char atiReadHoldingReg[ cmdLengthStatus ] = { // same length as get status command
   0x0a, // Slave Address ( DEC 10 )
   0x03, // standard modbus read register command
-  ATI_CALIBRATION_ADDR_HI, // padding, start of status word register)
-  ATI_CALIBRATION_ADDR_LO, // status word register
+  0x00,	// padding, start of status word register) ATI_CALIBRATION_ADDR
+  0x00, // status word register ATI_CALIBRATION_ADDR
   0x00, // padding, # of holding registers to read; TBD
   0x00, //   # of holding registers to read; TBD
   0x00, // 1st CRC byte; TBD
@@ -247,6 +252,113 @@ void ATIstopStreaming( void ) {
 }
 
 
+// helper function to read from holding registers (e.g. calibration values) via MODBUS
+// each addr entry pointed to (points) of the holding registers is 2 bytes wide.
+void ATIreadHoldingRegister( unsigned short addr , unsigned short numPointsToRead){
+	
+	unsigned short myCRC;
+	unsigned long T;
+	char incoming[512];  // used to process incoming messages that need a CRC check. 
+	unsigned char addrHi, addrLo;
+	addrHi = addr >> 8;
+	addrLo = addr & 0x00FF;
+	
+	// update the command atiReadHoldingReg[cmdLengthStatus] with new address and by
+	//atiReadHoldingReg[ 0 ] = 0x0a; // Slave Address ( DEC 10 )
+	//atiReadHoldingReg[ 1 ] = 0x03; // std modbus read register command
+	atiReadHoldingReg[ 2 ] = addrHi; // start of status word register, High
+	atiReadHoldingReg[ 3 ] = addrLo; // status word register, low
+	atiReadHoldingReg[ 4 ] = numPointsToRead >> 8; //   # of holding registers to read; High
+	atiReadHoldingReg[ 5 ] = numPointsToRead;      //   # of holding registers to read; Low
+	myCRC = CRC16( atiReadHoldingReg, 6 );
+	
+	atiReadHoldingReg[ 6 ] = myCRC >> 8; // 1st CRC byte; 
+	atiReadHoldingReg[ 7 ] = myCRC;  	 // 2nd CRC byte; 
+	
+	//Serial.println(" in function ATIreadHoldingRegister() ");
+	//Serial.print(" atiReadHoldingReg command: \r\n");
+	//for( int i = 0; i < cmdLengthStatus ; i++)
+	//	Serial.println( atiReadHoldingReg[ i ] , HEX );	
+	//Serial.print(" numPointsToRead: "); Serial.println( numPointsToRead, HEX );
+	//Serial.print(" myCRC "); Serial.println( myCRC, HEX);
+	
+	// write the command 
+	HWSERIAL.clear();
+	HWSERIAL.write( atiReadHoldingReg, cmdLengthStatus ); HWSERIAL.flush();
+	
+	
+	/*
+	Serial.println("Let's get everything in response for 2 s...");	
+	T = micros();
+	while( micros()-T < 2000000 ) 
+	{
+		delayMicroseconds( 1000 );
+		Serial.println( HWSERIAL.available());
+		
+		if( HWSERIAL.available()) 
+		{
+			//Serial.print(micros());
+			//Serial.print("   "); 
+			//Serial.println( HWSERIAL.read(), HEX);
+		}
+	}*/
+	
+	
+	T = micros();
+	// consume the expected response bytes from ATI NetCANOEM board (response ACK 5+2n bytes )
+	// the 5 comes from: address, command type, numberofBytes, crc1, crc2;
+    while ( HWSERIAL.available() < 5 + 2*numPointsToRead ) {
+		/* do nothing */
+		if ( micros() - T > TIMEOUT_US * 6 * 6 ) // longer timeout due to 6x6 matrix reads
+		{
+		  gATIsensorIsConnected = false;
+		  gATIstatus = gATIstatus*0-1;		  
+		  Serial.println(" Internal Error: Failed to read a holding register due to timeout");
+		  Serial.print("   waiting for "); Serial.println( 5 + 2*numPointsToRead ); 
+		  Serial.print(" bytes, got: "); Serial.println( HWSERIAL.available());
+		  return; // BREAK OUT OF THIS FUNCTION; No response from  ATI Sensor
+		}
+	}
+	
+	
+	
+	// read stuff into incoming, check if it's ok, then copy over confirmed payload to tempBuffer.
+	// Serial.println("Reading expected holding register bytes...");
+	// read in everything	
+	for ( int i = 0; i < 5+2*numPointsToRead; i++ )
+	{
+		incoming[ i ] = HWSERIAL.read();
+		//tempBuffer[ i ] = '\0'; 
+		//Serial.println( incoming[ i ] , HEX);
+	}
+	
+	if ( incoming[ 0 ] != 0x0A ) Serial.println( "Internal error: unexpected address in reading holding registers");
+	if ( incoming[ 1 ] != 0x03 ) Serial.println( "Internal error: unexpected functionID in reading holding registers");
+	if ( incoming[ 2 ] != 2*numPointsToRead ) Serial.println( "Internal error: unexpected # of bytes in response from holding register");
+  	myCRC = CRC16( incoming, 3 + 2*numPointsToRead ); // compute crc on everything except last 2 crc bytes
+	if ( ((myCRC >> 8	) != incoming[ 3+2*numPointsToRead     ]) |
+	     ((myCRC & 0x00FF) != incoming[ 3+2*numPointsToRead + 1])  )
+		 Serial.println("Internal error: failed crc check when reading holding registers");	
+	//Serial.print("myCRC, crcH, crcL: ");
+	//Serial.println( myCRC >> 8 		, HEX  );  
+	//Serial.println( myCRC & 0x00FF 	, HEX  ); 
+	//Serial.println( incoming[ 3+2*numPointsToRead     ], HEX); //access 1st CRC byte
+	//Serial.println( incoming[ 3+2*numPointsToRead + 1 ], HEX); //access 2nd CRC byte)
+	
+	// copy over only the payload	
+	for ( int i = 0; i < 2*numPointsToRead; i++ )
+	{
+		tempBuffer[ i ] = incoming[ i + 3 ]; 
+		//Serial.println( tempBuffer[ i     ] );
+	}
+	tempBuffer [ 2*numPointsToRead    ] = '\0';
+	tempBuffer [ 2*numPointsToRead + 1] = '\0';
+	
+	return;
+	
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////////////
 //  Reads the calibration information in the calibration table at address ATI_CALIBRATION_ADDR; 
 //    default is Calibration 1 --> calibrationNum = 1 at address ATI_CALIBRATION_ADDR
@@ -261,6 +373,16 @@ void ATIstopStreaming( void ) {
 bool ATIinitialize( void ){
 
   ATIcalibrationBanner = "%% ATI Sensor not initialized; Calibration & units unknown. ";
+  String sCalibSerialNumber, sCalibPartNumber, sCalibFamilyId, sCalibTime; 
+  
+  float BasicMatrix[6][6];
+  unsigned ForceUnits;
+  unsigned TorqueUnits;
+  float MaxRating[6];
+  int CountsPerForce;
+  int CountsPerTorque;
+  unsigned int GageGain[6];
+  unsigned int GageOffset[6];
   
   //  Read the calibration information in the calibration table labeled calibrationNum;   
   //  assumes no tool transformations in the "active calibration matrix"
@@ -284,87 +406,75 @@ bool ATIinitialize( void ){
   //  uint8 UserField2[16];
   //  uint8 SpareData[16];
   // The code below will attempt to read the desired fields above.
-  unsigned long T;
-  unsigned short myStatus = 0;
-  unsigned char bytesToRead;
-  // First figure out how many bytes to read the first time, update atiReadCalibration command and crc fields
-  bytesToRead = 8*8 ; // //  uint8 CalibSerialNumber[8];
-  //  uint8 CalibSerialNumber[8];
-
-  //unsigned short CRC16(unsigned char *puchMsg, unsigned short usDataLen)
-  ////unsigned char *puchMsg ;    /* message to calculate CRC upon */
-  ////unsigned short usDataLen ;  /* quantity of bytes in message */
   
-  HWSERIAL.write( atiReadCalibration, cmdLengthStatus ); HWSERIAL.flush();
-  //HWSERIAL.clear();
+
   
-  unsigned short registerValHi, registerValLow;
+  //  uint8 CalibSerialNumber[8], 
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR, 8/2);  
+  sCalibSerialNumber =  tempBuffer ;
+  Serial.print("sCalibSerialNumber = ");  Serial.println( sCalibSerialNumber );
+  
+  //  uint8 CalibPartNumber[32];
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8)/2, 32/2);  
+  sCalibPartNumber = tempBuffer ;
+  
+  //  uint8 CalibFamilyId[4];
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32)/2, 4/2);  
+  sCalibFamilyId = tempBuffer ;
+  
+  //  uint8 CalibTime[20];
+  ATIreadHoldingRegister( ATI_CALIBRATION_ADDR +(8+32+4)/2, 20/2);  
+  sCalibTime = tempBuffer ;
 
-  /*delay(20); Serial.println("Let's get everything in response for 10 s...");
-  T = micros();
-  while( HWSERIAL.available() || micros()-T < 10000000) 
-    if( HWSERIAL.available()) 
-    {Serial.print(micros()); Serial.print("   "); Serial.println( HWSERIAL.read(), HEX);}
-  */
-
-  /*
-  T = micros();
-  // consume the expected response bytes from ATI NetCANOEM board (response ACK 5+2 bytes )
-  while ( HWSERIAL.available() < 5+2 ) {
-    // do nothing 
-    if ( micros() - T > TIMEOUT_US )
-    {
-      gATIsensorIsConnected = false;
-      myStatus = myStatus*0-1;
-      gATIstatus = myStatus;
-      Serial.println(" Internal Error: Failed to read status");
-      return myStatus; // BREAK OUT OF THIS FUNCTION; No response from  ATI Sensor
-    }
+  ATIcalibrationBanner = "% ATI_CalibSerialNumber = " + sCalibSerialNumber + "\r\n" +
+						 "% ATI_CalibPartNumber = " + sCalibPartNumber + "\r\n" +
+						 "% ATI_CalibFamilyId = " + sCalibFamilyId + "\r\n" + 
+						 "% ATI_CalibTime = " + sCalibTime + "\r\n" + 
+						 "% \r\n";
+  Serial.println( ATIcalibrationBanner );  
+  
+  //  float BasicMatrix[6][6]; // have to read in 6 floats at a time due to MODBUS length restrictions
+  float f,f2 = 0;
+  float *f_ptr;  // pointer to float  
+  char  charArry[4];  // for swaping byte order to float
+  for (int i = 0; i<6; i++) 
+  {
+	ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8+32+4+20+i*6*4)/2,  6*4/2);  // floats are 4 bytes, 32bits in ATI doc   
+	for (int j = 0; j < 6; j++)
+	{	
+		/*f = static_cast<float> (tempBuffer[ i + 0 ]<<(8*3) + 
+			tempBuffer[ i + 1 ]<<(8*2) +
+			tempBuffer[ i + 2 ]<<(8  ) +
+			tempBuffer[ i + 3 ] )         ;
+				
+		f = *(float*) (tempBuffer); // gives same as   memcpy(&f2, &tempBuffer[0], sizeof(float));*/
+		
+		charArry[3] = tempBuffer[ j*4 + 0 ];
+		charArry[2] = tempBuffer[ j*4 + 1 ];
+		charArry[1] = tempBuffer[ j*4 + 2 ];
+		charArry[0] = tempBuffer[ j*4 + 3 ];		
+		memcpy( &f2, charArry, sizeof(float));
+		BasicMatrix[i][j] = f2;
+		
+		/*Serial.print( tempBuffer[ i + 0 ]<<(8*3) , BIN); Serial.print( " " );
+		Serial.print( tempBuffer[ i + 1 ]<<(8*2) , BIN); Serial.print( " " );
+		Serial.print( tempBuffer[ i + 2 ]<<(8*1) , BIN); Serial.print( " " );
+		Serial.print( tempBuffer[ i + 3 ]<<(8*0) , BIN); Serial.print( " -  " );
+		
+		BasicMatrix[i][j] = tempBuffer[j + i*6 + 3*(j+i*6) + 0] << 8*3 +  
+							tempBuffer[j + i*6 + 3*(j+i*6) + 1] << 8*2 +
+							tempBuffer[j + i*6 + 3*(j+i*6) + 2] << 8*1 +
+							tempBuffer[j + i*6 + 3*(j+i*6) + 3] << 8*0 ;
+							*/
+		//Serial.print( j + i*6 + 3*(j+i*6)  ) ; Serial.print( ", " )		;	
+		
+		//Serial.print( " \t ");
+		Serial.print( BasicMatrix[i][j] ); Serial.print( "\t  " )		;
+		
+		//Serial.print( "  f = " ); Serial.println( f );  Serial.print( "  f2 = " ); Serial.println( f2 ); 
+	}
+	Serial.println();
   }
-  */
-  // while( HWSERIAL.available()) Serial.println( HWSERIAL.read(), HEX);
-  // delay(20); Serial.println("Let's try again...");  
-  // T = micros();
-  // while( HWSERIAL.available() || micros()-T < 1000000) Serial.println( HWSERIAL.read(), HEX);
-  
-  // Should read the following (5 bytes + 2 crc bytes = 7 bytes):
-  //  0x0a (slave address)
-  //  0x03 (Function code == read holding register, same as command)
-  //  0x(2*N) =2 total # of bytes to read (=2*N where N is quantity of registers, 1 register = 2bytes)
-  //  0xZZ  MSB status
-  //  0xZZ  LSB status 
-  //  0xXX, 0xYY 1st and last CRC bytes
-  //  0x0   Error;  Bad if 0x83; exceptions of x01,02, ... 0x04.  0x00 is ALL OK.
-  //if ( HWSERIAL.read() != 0x0A ) Serial.println( "Internal error: unexpected address in response from get status");
-  //if ( HWSERIAL.read() != 0x03 ) Serial.println( "Internal error: unexpected functionID in response from get status");
-  //bytesToRead = HWSERIAL.read();
-  //if ( bytesToRead > 2 ) Serial.println( "Internal error: unexpected # of bytes in response from get status");
-  ////for ( int i = 0; i < bytesToRead; i = i+2 )
-  ////{    
-  //  registerValHi  = HWSERIAL.read(); // read MSB first
-  //  registerValLow = HWSERIAL.read(); // read LSB last
-  ////}
-
-  //// combine both registers into two-byte word
-  ////Serial.print("registerValHi : ");Serial.println( registerValHi , BIN );
-  ////Serial.print("registerValLow: ");Serial.println( registerValLow, BIN );
-
-  //Serial.print("Before: "); Serial.println( myStatus, BIN );
-  //myStatus = (static_cast<unsigned short>(registerValHi) << 8 ) +  static_cast<unsigned short>(registerValLow);
-  //Serial.print("After: ");Serial.println( myStatus, BIN );
-
-  // TODO:  run CRC code for extra confirmation 
-  // (note if anything was corrupted the status returned will be nonzero, so CRC not crucial here
-  //HWSERIAL.read();  // first CRC byte
-  //HWSERIAL.read();  // second CRC byte
-  
-  //gATIsensorIsConnected = true;
-  //gATIisStreaming = false;
-  //gATIstatus = myStatus;
-  //HWSERIAL.clear();
-  //return myStatus;
-
-  
   ///////////////////////////////////////////////////////////////////////////////////////
   //  send "Unlock Storage command" to unlock active gain and offset hardware settings
   ///////////////////////////////////////////////////////////////////////////////////////
