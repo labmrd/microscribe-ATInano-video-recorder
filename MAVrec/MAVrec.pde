@@ -2,8 +2,8 @@ import g4p_controls.*;
 import processing.video.*;
 import com.hamoid.*;
 import processing.serial.*;
-
-
+import java.util.Arrays;
+import java.util.List;
 
 
 //String comPort = "COM4";
@@ -50,13 +50,135 @@ void captureEvent(Capture video) {
 
 int FPS = 30;
 
+
+
+
+
+public interface myCLibrary extends Library {
+   myCLibrary INSTANCE = (myCLibrary)  Native.load("armdll64.dll", myCLibrary.class);
+             //void printf(String format, Object... args);
+ 
+ 
+   public static class HWND extends PointerType {
+      public HWND(Pointer address) {
+        super(address);
+      }
+      public HWND() {
+        super();
+      }
+     }
+  //@FieldOrder({ "x", "y", "z"})
+  public static class length_3D extends Structure /*<length_3D, length_3D.ByValue, length_3D.ByReference >*/{
+  /** C type : length */
+  public float x;
+  /** C type : length */
+  public float y;
+  /** C type : length */
+  public float z;
+  public length_3D() {
+    super();
+  }
+  protected List getFieldOrder() {
+         return Arrays.asList("x", "y", "z");
+     }
+
+  //protected List<? > getFieldOrder() {
+  //  return Arrays.asList("x", "y", "z");
+  //}
+  /**
+   * @param x C type : length<br>
+   * @param y C type : length<br>
+   * @param z C type : length
+   */
+  public length_3D(float x, float y, float z) {
+    super();
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+  //public length_3D(Pointer peer) {
+  //  super(peer);
+  //}
+  protected ByReference newByReference() { return new ByReference(); }
+  //protected ByValue newByValue() { return new ByValue(); }
+  protected length_3D newInstance() { return new length_3D(); }
+  //public static length_3D[] newArray(int arrayLength) {
+  //  return Structure.newArray(length_3D.class, arrayLength);
+  //}
+  public static class ByReference extends length_3D implements Structure.ByReference {
+    
+  };
+  //public static class ByValue extends length_3D implements Structure.ByValue {
+    
+  //};
+  }
+  int ArmStart(myCLibrary.HWND hwndParent);
+  void ArmEnd();
+  // Original signature : <code>int ArmConnect(int, long)</code><br>
+  // <i>native declaration : line 452</i>  
+  int ArmConnect(int port, NativeLong baud);
+  // Original signature : <code>void ArmDisconnect()</code><br>
+  // <i>native declaration : line 454</i>   
+  void ArmDisconnect();
+  // Original signature : <code>int ArmSetUpdateEx(int, UINT)</code><br>
+  //<i>native declaration : line 468</i>  
+  int ArmSetUpdateEx(int type, int minUpdatePeriodms);
+   // Original signature : <code>int ArmGetTipPosition(length_3D*)</code><br>
+   // <i>native declaration : line 470</i>
+  int ArmGetTipPosition(length_3D pPosition);
+  // Original signature : <code>int ArmGetTipOrientation(angle_3D*)</code><br>
+  //<i>native declaration : line 471</i>  
+  int ArmGetTipOrientation(length_3D pAngles); // angle about x, y, z
+  // Original signature : <code>int ArmGetTipOrientationUnitVector(angle_3D*)</code><br>
+  // <i>native declaration : line 472</i>  
+  int ArmGetTipOrientationUnitVector(length_3D pOrientationUnitVector); // tip orientation vector in x,y,z
+  
+  
+  
+  public static final int ARM_SUCCESS = (int)0;
+  public static final int ARM_FULL = (int)0x0010;
+}
+
+public interface MicroscribeLibrary extends StdCallLibrary {
+  
+  //"armdll64.dll"
+   //MicroscribeLibrary INSTANCE = (MicroscribeLibrary) Native.load("armdll64.dll", MicroscribeLibrary.class);
+   //int ArmStart( null );
+  //public static final String JNA_LIBRARY_NAME = "armdll64.dll";//LibraryExtractor.getLibraryPath("microscribe", true, MicroscribeLibrary.class);
+  //public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(MicroscribeLibrary.JNA_LIBRARY_NAME, MangledFunctionMapper.DEFAULT_OPTIONS);
+  //public static final MicroscribeLibrary INSTANCE = (MicroscribeLibrary)Native.loadLibrary(MicroscribeLibrary.JNA_LIBRARY_NAME, MicroscribeLibrary.class, MangledFunctionMapper.DEFAULT_OPTIONS);
+  
+}
+
 ////////////////////////////////////////////////////////////
 //     SETUP (runs once)                             ///////
 ////////////////////////////////////////////////////////////
+int t0_ms, t_ms;  // time keeping variable for when recording was started (ms, for microscribe);
 public void setup(){
   size(800, 600 );
   createGUI();
   customGUI();
+  
+  println("myClibrary.ArmStart: ");  
+  println( myCLibrary.INSTANCE.ArmStart( null )) ;
+  println( "myClibrary.ArmConnect(0,0): ");  // ARM_SUCCESS == 0
+  println( myCLibrary.INSTANCE.ArmConnect(0, null) ); // ARM_SUCCESS == 0 
+  println( "myClibrary.ArmSetUpdateEx( , ): ");  // ARM_SUCCESS == 0
+  println( myCLibrary.INSTANCE.ArmSetUpdateEx((int)0x0010, 20) ); //   public static final int ARM_FULL = (int)0x0010;
+  
+  //println( "myClibrary.ArmgetTipPositions: ");  // ARM_SUCCESS == 0
+  //myCLibrary.length_3D myTipPos = new myCLibrary.length_3D();  
+  //println("\t before: x, y, z = " +myTipPos.x +", " +myTipPos.y + ", " +myTipPos.z );
+  //println( myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  ) );
+  //println("\t after: x, y, z = " +myTipPos.x +", " +myTipPos.y + ", " +myTipPos.z );
+  
+  
+  //myCLibrary.INSTANCE.ArmDisconnect();
+  //myCLibrary.INSTANCE.ArmEnd(  ) ;
+  //println("myClibrary.Disconnected and .ArmEnded. ");
+  
+  
+  
   
   // Establish connection to arduino if serial port is available
   println("Available serial ports: ");  printArray( Serial.list() );
@@ -105,7 +227,7 @@ public void setup(){
   }
 
   sPort.clear();
-  sPort.write('R');  // Send the 'R' character to Arduino to start 'recording'  
+  sPort.write('b');  // Send the 'b' character to Arduino to 'begin recording'  
 
   amRecording = false; 
   amReady = true;
@@ -114,6 +236,9 @@ public void setup(){
 }
 
 
+myCLibrary.length_3D myTipPos = new myCLibrary.length_3D();
+myCLibrary.length_3D myTipUnitDirection = new myCLibrary.length_3D();  
+myCLibrary.length_3D myTipRPY = new myCLibrary.length_3D();
 
 ////////////////////////////////////////////////////////////
 //     MAIN LOOP (runs until closed)                 ///////
@@ -122,11 +247,22 @@ public void draw(){
   
   // get arduino data if it is available,
   if (sPort.available() > 0) {  
+    // the moment it arrives get the microscribe data and a timestamp
+    myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
+    myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
+    // microscribeTime = ;    
     sData =  sPort.readStringUntil('\n');    
     //sData =  sPort.readString(); 
     //logData(file1,getDateTime() + sData,true);
     //delay(logDelay);
     //print("serial data: " + sData);
+    sData = sData.substring(0, sData.length()-1) + "   " + 
+        nf(myTipPos.x,0,5) + " " + nf(myTipPos.y,0,5) + " " +nf(myTipPos.z,0,5) +
+        nf(myTipRPY.x,0,5) + " " + nf(myTipRPY.y,0,5) + " " + nf(myTipRPY.z,0,5) + 
+        "  " + (millis() - t0_ms);
+    //println(  );
+    //println("\t after: x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
+    //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );  
   }
 
 
@@ -171,8 +307,19 @@ public void draw(){
   text( "Cameras available  [qty. "+ numCamsAvailable +"]:\r\n", 15, 210);
   text( join(cameras, "\r\n") + "\r\n", 20, 225);
   
-  text( "Latest motion/forces data:" , 15, 250);
-  text( " " + sData , 20, 265);
+  text( "Latest motion/forces data: " + sData  , 15, 350);  
+  //text( " " + sData , 20, 265);
+  
+
+  
+  //myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );  
+  //myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
+  //println(  );
+  //println("\t after: x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
+  //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );
+  
+  //text( "  pose  x,  y,  z  [cm]: "  + nf(myTipPos.x,0,2) + ", " + nf(myTipPos.y,0,2) + ", " +nf(myTipPos.z,0,2) +
+  //  "\r\n  roll, pitch, yaw [deg]: " + nf(myTipRPY.x,0,2) + ", " + nf(myTipRPY.y,0,2) + ", " + nf(myTipRPY.z,0,2)   , 20, 280);
   
   
   // Here we don't save what we see on the display,

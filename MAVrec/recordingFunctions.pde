@@ -6,8 +6,10 @@ String bannerUnits =
   "Fx[N] Fy[N] Fz[N] \tTx[Nm] Ty[Nm] Tz[Nm] % status info";
 public boolean beginRecording( ){
   
-  sPort.write('S'); sPort.clear();
-  sPort.write('R'); // this shoul reset arduino time counter to 0
+  sPort.write('x'); sPort.clear();
+  sPort.write('b'); // this should reset arduino time counter to 0 (b for begin new recording)
+  
+  t0_ms = millis();
   
   fileTime = getTimestamp();
   fileName = fileStub + "_" + fileTime;
@@ -56,6 +58,7 @@ public boolean beginRecording( ){
   
   
   amRecording = true;  
+  
   return true; // all worked
   
   
