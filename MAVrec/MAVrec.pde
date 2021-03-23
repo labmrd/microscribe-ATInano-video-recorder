@@ -4,7 +4,14 @@ import com.hamoid.*;
 import processing.serial.*;
 import java.util.Arrays;
 import java.util.List;
+import org.multiply.processing.TimedEventGenerator;
+import java.lang.*;
 
+private TimedEventGenerator microscribeTimedEventGenerator;
+private int lastMicroscribeMillis = 0;
+
+//String myPath = myPath;
+//NativeLibrary.addSearchPath("armdll64.dll", "test");
 
 //String comPort = "COM4";
 String comPort = Serial.list()[Serial.list().length-1];   
@@ -36,7 +43,8 @@ String [] cameras;
 String [] videoOptions;
 int samplePeriod  = 100;   // ms.  On samle every samplePeriod seconds
 Serial sPort;  
-String sData;
+String sData; // serial data (timestamps plus ATI 
+String mData; // microscribe data string
 
 
 boolean amRecording;
@@ -55,7 +63,9 @@ int FPS = 30;
 
 
 public interface myCLibrary extends Library {
-   myCLibrary INSTANCE = (myCLibrary)  Native.load("armdll64.dll", myCLibrary.class);
+   //Native.addSearchPath( "armdll64.dll" , "C:\\tissueCapture\\" );
+   myCLibrary INSTANCE = (myCLibrary)  Native.load("C:\\tissueCapture\\MAVrec\\armdll64.dll", myCLibrary.class);
+  //addSearchPath("armdll64.dll", "test");
              //void printf(String format, Object... args);
  
  
@@ -139,26 +149,22 @@ public interface myCLibrary extends Library {
   public static final int ARM_FULL = (int)0x0010;
 }
 
-public interface MicroscribeLibrary extends StdCallLibrary {
-  
-  //"armdll64.dll"
-   //MicroscribeLibrary INSTANCE = (MicroscribeLibrary) Native.load("armdll64.dll", MicroscribeLibrary.class);
-   //int ArmStart( null );
-  //public static final String JNA_LIBRARY_NAME = "armdll64.dll";//LibraryExtractor.getLibraryPath("microscribe", true, MicroscribeLibrary.class);
-  //public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(MicroscribeLibrary.JNA_LIBRARY_NAME, MangledFunctionMapper.DEFAULT_OPTIONS);
-  //public static final MicroscribeLibrary INSTANCE = (MicroscribeLibrary)Native.loadLibrary(MicroscribeLibrary.JNA_LIBRARY_NAME, MicroscribeLibrary.class, MangledFunctionMapper.DEFAULT_OPTIONS);
-  
-}
+
 
 ////////////////////////////////////////////////////////////
 //     SETUP (runs once)                             ///////
 ////////////////////////////////////////////////////////////
 int t0_ms, t_ms;  // time keeping variable for when recording was started (ms, for microscribe);
 public void setup(){
+  
   size(800, 600 );
   createGUI();
   customGUI();
   
+  microscribeTimedEventGenerator = new TimedEventGenerator(this);
+  microscribeTimedEventGenerator.setIntervalMs(30);
+  //println( System.getProperties() );
+  println( System.getProperty("jna.library.path" ) );  // .addSearchPath("armdll64.dll", "test");
   println("myClibrary.ArmStart: ");  
   println( myCLibrary.INSTANCE.ArmStart( null )) ;
   println( "myClibrary.ArmConnect(0,0): ");  // ARM_SUCCESS == 0
@@ -176,7 +182,7 @@ public void setup(){
   //myCLibrary.INSTANCE.ArmDisconnect();
   //myCLibrary.INSTANCE.ArmEnd(  ) ;
   //println("myClibrary.Disconnected and .ArmEnded. ");
-  
+  println( System.getProperties() );
   
   
   
@@ -256,10 +262,10 @@ public void draw(){
     //logData(file1,getDateTime() + sData,true);
     //delay(logDelay);
     //print("serial data: " + sData);
-    sData = sData.substring(0, sData.length()-1) + "   " + 
+    /*sData = sData.substring(0, sData.length()-1) + "   " + 
         nf(myTipPos.x,0,5) + " " + nf(myTipPos.y,0,5) + " " +nf(myTipPos.z,0,5) +
         nf(myTipRPY.x,0,5) + " " + nf(myTipRPY.y,0,5) + " " + nf(myTipRPY.z,0,5) + 
-        "  " + (millis() - t0_ms);
+        "  " + (millis() - t0_ms);*/
     //println(  );
     //println("\t after: x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
     //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );  
@@ -307,8 +313,11 @@ public void draw(){
   text( "Cameras available  [qty. "+ numCamsAvailable +"]:\r\n", 15, 210);
   text( join(cameras, "\r\n") + "\r\n", 20, 225);
   
-  text( "Latest motion/forces data: " + sData  , 15, 350);  
-  //text( " " + sData , 20, 265);
+  text( "Latest motion  [ms x y z r p y]: \r\n   " + mData , 15, 255); 
+    
+  text( "Latest forces data [ms Fx Fy Fz Tx Ty Tz]: \r\n   " + sData  , 15, 290);  
+  
+  
   
 
   
@@ -365,4 +374,19 @@ public void customGUI(){
   dropListCam2.setItems( videoOptions, vid2Selection );
   
   //println( height );
+}
+
+void onTimerEvent() {
+  int millisDiff = millis() - lastMicroscribeMillis;
+  lastMicroscribeMillis = millisDiff + lastMicroscribeMillis;  
+  myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
+  myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
+  //System.out.println("Got a timer event at " + millis() + "ms (" + millisDiff + ")!");
+  //setRandomFillAndStroke();
+  //ellipse(random(width), random(height), random(100), random(100));
+  //println("\t x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
+  //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );
+  mData = "% " + millis() + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
+           " , " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z ;
+  
 }
