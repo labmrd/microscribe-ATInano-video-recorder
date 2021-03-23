@@ -64,7 +64,7 @@ int FPS = 30;
 
 public interface myCLibrary extends Library {
    //Native.addSearchPath( "armdll64.dll" , "C:\\tissueCapture\\" );
-   myCLibrary INSTANCE = (myCLibrary)  Native.load("C:\\tissueCapture\\MAVrec\\armdll64.dll", myCLibrary.class);
+   myCLibrary INSTANCE = (myCLibrary)  Native.load("armdll64.dll", myCLibrary.class); // should be in ./code/ dir (on class path)
   //addSearchPath("armdll64.dll", "test");
              //void printf(String format, Object... args);
  
@@ -164,7 +164,9 @@ public void setup(){
   microscribeTimedEventGenerator = new TimedEventGenerator(this);
   microscribeTimedEventGenerator.setIntervalMs(30);
   //println( System.getProperties() );
-  println( System.getProperty("jna.library.path" ) );  // .addSearchPath("armdll64.dll", "test");
+  println( System.getProperty("jna.library.path" ) );  // this is where the dll's need to be  .addSearchPath("armdll64.dll", "test");
+  println( " My Local Java path:");
+  println( System.getProperty("java.library.path"));//"java.class.path"));//"user.dir") );
   println("myClibrary.ArmStart: ");  
   println( myCLibrary.INSTANCE.ArmStart( null )) ;
   println( "myClibrary.ArmConnect(0,0): ");  // ARM_SUCCESS == 0
@@ -313,9 +315,9 @@ public void draw(){
   text( "Cameras available  [qty. "+ numCamsAvailable +"]:\r\n", 15, 210);
   text( join(cameras, "\r\n") + "\r\n", 20, 225);
   
-  text( "Latest motion  [ms x y z r p y]: \r\n   " + mData , 15, 255); 
+  text( "Latest Microscribe Motion  [t(ms) x y z(cm) r p y(deg)]: \r\n   " + mData , 15, 290); 
     
-  text( "Latest forces data [ms Fx Fy Fz Tx Ty Tz]: \r\n   " + sData  , 15, 290);  
+  text( "Latest forces data [t(ms) Fx Fy Fz (N) Tx Ty Tz(Nm)]: \r\n   " + sData  , 15, 255);  
   
   
   
