@@ -6,8 +6,9 @@
 
 #define LED_PIN      13
                             // Sample period of timer interupt service routine (ISR) in microseconds
-#define   TIMER_PERIOD 10000 // e.g. set a timer of length 10000 microseconds (or 0.1 sec - or 10Hz) 
+//#define   TIMER_PERIOD 10000 // e.g. set a timer of length 10000 microseconds (or 0.1 sec - or 10Hz) 
 //#define TIMER_PERIOD 1000   // 1000us = 1ms =>  1 KHz update rate.
+#define TIMER_PERIOD 20000    // 20ms --> 50Hz update rate
 
 // Create an IntervalTimer object 
 IntervalTimer myTimer;
@@ -19,7 +20,7 @@ IntervalTimer myTimer;
 //                          THEN, WHEN DONE READING: set lastread = iRead
 #define BUF_LENGTH     1000  // number of entries in ring buffer before overflow
 #define BUF_DIMENSION  1     // number of items per buffer location  (e.g.  dataSamples per buffer location)
-#define BANNER         "% t[ms]    Fx[N]    Fy[N]   Fz[N]   Tx[Nm]  Ty[Nm]  Tz[Nm]"
+#define BANNER         "%  t[ms]  Fx[N]    Fy[N]   Fz[N]   Tx[Nm]  Ty[Nm]  Tz[Nm]   " 
 struct myDataSample {
   unsigned long int t;  // time of sample (milli sec)  
   float Fx;    // 
@@ -37,6 +38,7 @@ bool ringBufferOverflow;
 volatile unsigned long int lastWritten;
 volatile unsigned long int lastRead;
 volatile unsigned long int iWrite, iRead; // index values for bookeeping
+bool amRecording; 
 
 volatile static unsigned long int t0 ;//= micros(); // only gets initialized the first time function is called
 
@@ -55,7 +57,7 @@ void setup() {
   //Timer1.attachInterrupt( timerIsr ); // attach the service routine here
   //myTimer.begin( timerIsr, TIMER_PERIOD );
   
-
+  amRecording = false;
   
 }
 
@@ -69,16 +71,25 @@ void loop() {
     
     if (ch == 'b' || (ch == 'B')) {        // BEGIN data streaming
       
-      t0 = millis();
-      myTimer.begin( timerIsr, TIMER_PERIOD );
-      Serial.println("%% STATUS: Starting new recording ...");
+      if (!amRecording)
+      {         
+        amRecording = true; 
+        t0 = millis(); 
+        myTimer.begin( timerIsr, TIMER_PERIOD );
+        //Serial.println("%% STATUS: Starting new recording ...");
+        
+      }
       
     } else if (ch == 'X' || (ch == 'x')) 
     { 
       // STOP/KILL  data streaming
       myTimer.end();
+      Serial.flush();
       delay( 100 );
-      Serial.println("%% STATUS: ending data stream");
+      lastRead = 0;
+      lastWritten = 0;
+      amRecording = false;
+      //Serial.println("%% STATUS: ending data stream");
       
     }
 
@@ -98,21 +109,21 @@ void loop() {
       //ringBuffer[iRead][0].vel = ringBuffer[iRead][0].pos - ringBuffer[(iRead-1)%BUF_LENGTH][0].pos;
       //ringBuffer[iRead][0].acc = ringBuffer[iRead][0].vel - ringBuffer[(iRead-1)%BUF_LENGTH][0].vel;
 
-      // output to serial as ASCII
-      Serial.print( ringBuffer[iRead][0].t );
-      Serial.print( "    " );  
+      // output to serial as ASCII 
+      Serial.print( ringBuffer[iRead][0].t );      
+      Serial.print( ",    " );
       Serial.print( ringBuffer[iRead][0].Fx );
-      Serial.print( "  " );
+      Serial.print( ",  " );
       Serial.print( ringBuffer[iRead][0].Fy );
-      Serial.print( "  " ); 
+      Serial.print( ",  " ); 
       Serial.print( ringBuffer[iRead][0].Fz );
-      Serial.print( "    " ); 
+      Serial.print( ",    " ); 
       Serial.print( ringBuffer[iRead][0].Tx );
-      Serial.print( "  " ); 
+      Serial.print( ",  " ); 
       Serial.print( ringBuffer[iRead][0].Ty );
-      Serial.print( "  " ); 
-      Serial.println( ringBuffer[iRead][0].Tz );
-      //Serial.println( " " );
+      Serial.print( ",  " ); 
+      Serial.print( ringBuffer[iRead][0].Tz );   
+      Serial.println(  );
       
       lastRead = iRead; // officially done reading the iRead entry
     }

@@ -1,35 +1,50 @@
 ////////////////////////////////////////////////////////////
 //     BEGIN/START Recording                         ///////
 ////////////////////////////////////////////////////////////
-String bannerUnits = 
-"% X[mm] Y[mm] Z[mm] \t roll[deg] pitch[deg] yaw[deg] \t\t"+
-  "Fx[N] Fy[N] Fz[N] \tTx[Nm] Ty[Nm] Tz[Nm] % status info";
+String bannerUnitsMotion = 
+"% sampleTime[ms]  X[mm] Y[mm] Z[mm] \t roll[deg] pitch[deg] yaw[deg]  writingEndTime[ms]\t\t" +  "% status info\r\n";
+String bannerUnitsForces = 
+"% actualHardwareTime[ms]\t Fx[N] Fy[N] Fz[N]   Tx[Nm] Ty[Nm] Tz[Nm]\t % microscribe sample time [ms] % status info\r\n";
+
 public boolean beginRecording( ){
   
   sPort.write('x'); sPort.clear();
   sPort.write('b'); // this should reset arduino time counter to 0 (b for begin new recording)
   
   t0_ms = millis();
+  //lastMicroscribeMillis = millis();
   
   fileTime = getTimestamp();
   fileName = fileStub + "_" + fileTime;
   String banner= "% Motion and Forces Recording of Tissue Capture App\r\n" + 
-                 "% Timestamp YYYY.MM.DD_hh.mm.ss: " + fileTime + "\r\n" +
-                 "% Filename: \t\t " + fileName + "\r\n" +
-                 "% FileFolder: \t\t " + fileFolder +  "\r\n" +
-                 bannerUnits ;
+                 "% Timestamp YYYY.MM.DD_hh.mm.ss: " + fileTime + "\r\n" +                 
+                 "% FileFolder: \t\t " + fileFolder +  "\r\n" ;
+                 //"% Filename: \t\t " + fileName + "\r\n" +
+                 //bannerUnits ; motionFilenameEnd
                  
   // Create a new file in the sketch directory; Bail if that fails
   println("Opening file for writing ..." + fileFolder + fileName);
   try{
-    motionLog = createWriter( fileFolder + fileName + "_data.txt");
-    motionLog.print( banner );
+    motionLog = createWriter( fileFolder + fileName + "_motion.txt");
+    motionLog.print( banner + "% Filename: \t\t " + 
+                                fileName + motionFilenameEnd + "\r\n" + 
+                                bannerUnitsMotion );
+    forcesLog = createWriter( fileFolder + fileName + "_forces.txt");
+    forcesLog.print( banner + "% Filename: \t\t " + 
+                                fileName + forcesFilenameEnd + "\r\n" + 
+                                bannerUnitsForces );
     
   } finally {  
   
     //println(motionLog);
     if (motionLog == null) {
-      println("ERROR: Cannot open file for writing: " +fileFolder + fileName + "_data.txt");
+      println("ERROR: Cannot open file for writing: " +fileFolder + fileName + motionFilenameEnd);
+      println("\t\tTry to create the folder with the correct permissions?");
+      amRecording = false;
+      return false; // STOP TRYING TO RECORD YO!
+    }
+    if (forcesLog == null) {
+      println("ERROR: Cannot open file for writing: " +fileFolder + fileName + forcesFilenameEnd);
       println("\t\tTry to create the folder with the correct permissions?");
       amRecording = false;
       return false; // STOP TRYING TO RECORD YO!
@@ -70,10 +85,14 @@ public boolean beginRecording( ){
 ////////////////////////////////////////////////////////////
 public void stopRecording( ){
   amRecording = false;
+  //sPort.write('x'); 
   
   // stop writing text data to files;  close them out
   motionLog.flush();  // Writes the remaining data to the file
   motionLog.close();  // Finishes the file
+  // stop writing text data to files;  close them out
+  forcesLog.flush();  // Writes the remaining data to the file
+  forcesLog.close();  // Finishes the file
  
   
   if( textareaNotes.getText().length() == 1){
@@ -89,9 +108,15 @@ public void stopRecording( ){
   //textareaNotes.setPromptText("Enter notes here (any text in this box will be saved to the same filename set)");
   
   
+  
+  
   // finalize all videos and save
   if ( vid1Selection > 0 ) videoExport1.endMovie();
   if ( vid2Selection > 0 ) videoExport2.endMovie();
+  
+  //sPort.clear();
+  //sPort.write('b');
+  
 }
 
 // get a timestamp of the format YY.MM.DD_hh.mm.ss

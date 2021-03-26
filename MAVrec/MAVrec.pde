@@ -45,12 +45,15 @@ int samplePeriod  = 100;   // ms.  On samle every samplePeriod seconds
 Serial sPort;  
 String sData; // serial data (timestamps plus ATI 
 String mData; // microscribe data string
-
+String tempString;
+int numSerialPorts;
 
 boolean amRecording;
 boolean amReady;
 
-PrintWriter motionLog, notesLog;
+PrintWriter motionLog, forcesLog, notesLog;
+String motionFilenameEnd = "_motion.txt";
+String forcesFilenameEnd = "_forces.txt";
 
 void captureEvent(Capture video) {
    video.read();
@@ -189,15 +192,17 @@ public void setup(){
   
   
   // Establish connection to arduino if serial port is available
-  println("Available serial ports: ");  printArray( Serial.list() );
-  println("Last serial port:  " + Serial.list()[Serial.list().length-1] );
+  String [] serialList = Serial.list();
+  numSerialPorts = serialList.length;
+  println("Available serial ports: ");  printArray( serialList );  
+  println("Last serial port:  " + Serial.list()[ serialList.length - 1 ] );
   
   try {
    sPort = new Serial(this, comPort, comBaudrate );
    //sPort = new Serial(this, comPort, comBaudrate );
    // don’t read the serial buffer until a new line char
    // should use Serial.println("") in arduino code
-   sPort.bufferUntil('\n');   
+   //sPort.bufferUntil('\n');    // this should avoid breaking packets between \n characters (?)
   } finally {} 
   
   
@@ -234,9 +239,10 @@ public void setup(){
     vid2.start();
   }
 
-  sPort.clear();
+  sPort.write('x'); sPort.clear(); // make sure it gets stopped in case it was left running
   sPort.write('b');  // Send the 'b' character to Arduino to 'begin recording'  
-
+  t0_ms = millis(); 
+  
   amRecording = false; 
   amReady = true;
    
@@ -253,28 +259,8 @@ myCLibrary.length_3D myTipRPY = new myCLibrary.length_3D();
 ////////////////////////////////////////////////////////////
 public void draw(){
   
-  // get arduino data if it is available,
-  if (sPort.available() > 0) {  
-    // the moment it arrives get the microscribe data and a timestamp
-    myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
-    myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
-    // microscribeTime = ;    
-    sData =  sPort.readStringUntil('\n');    
-    //sData =  sPort.readString(); 
-    //logData(file1,getDateTime() + sData,true);
-    //delay(logDelay);
-    //print("serial data: " + sData);
-    /*sData = sData.substring(0, sData.length()-1) + "   " + 
-        nf(myTipPos.x,0,5) + " " + nf(myTipPos.y,0,5) + " " +nf(myTipPos.z,0,5) +
-        nf(myTipRPY.x,0,5) + " " + nf(myTipRPY.y,0,5) + " " + nf(myTipRPY.z,0,5) + 
-        "  " + (millis() - t0_ms);*/
-    //println(  );
-    //println("\t after: x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
-    //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );  
-  }
-
-
-
+  
+  // read cameras if needed
   if ((numCameras > 0) && vid1.available()) {
     vid1.read();
   }
@@ -283,14 +269,15 @@ public void draw(){
   }
   
   background(217);
-  text("Saving files named ...\r\n " + 
-    fileName + "_data.txt" + "\r\n " + 
-    fileName + "_vid1.mp4"  + "\r\n " +
-    fileName + "_vid2.mp4"  + "\r\n " +
-    fileName + "_notes.txt" ,    
+  text("Saving files named ...\r\n  " + 
+    fileName + "_forces.txt" + "\r\n  " + 
+    fileName + "_motion.txt" + "\r\n  " +
+    fileName + "_vid1.mp4"  + "\r\n  " +
+    fileName + "_vid2.mp4"  + "\r\n  " +
+    fileName + "_notes.txt\r\n" +  
+    "In folder ...\r\n  " + fileFolder,
     15, 90);
-  text("in folder ...\r\n " + fileFolder, 15, 90+80);
-  
+ 
   
   
   // Updates for camera changes
@@ -299,12 +286,12 @@ public void draw(){
   videoOptions = splice( cameras, "No Recording", 0 );
   
   if ( cameras.length < numCamsAvailable ) {
-    println("Lost camera(s), new camera count: " + cameras.length ); 
+    println("Lost camera(s), new camera count ... " + cameras.length ); 
     printArray( cameras );
     numCameras = cameras.length;    
     
   } else if (cameras.length > numCamsAvailable ){
-    println("Added camera(s), new camera count: " + cameras.length ); 
+    println("Added camera(s), new camera count ... " + cameras.length ); 
     printArray( cameras );
     numCameras = cameras.length;
     
@@ -312,12 +299,20 @@ public void draw(){
     
   dropListCam1.setItems( videoOptions, vid1Selection );
   dropListCam2.setItems( videoOptions, vid2Selection ); 
-  text( "Cameras available  [qty. "+ numCamsAvailable +"]:\r\n", 15, 210);
+  text( "Cameras available  (qty. "+ numCamsAvailable +") ... \r\n", 15, 210);
   text( join(cameras, "\r\n") + "\r\n", 20, 225);
   
-  text( "Latest Microscribe Motion  [t(ms) x y z(cm) r p y(deg)]: \r\n   " + mData , 15, 290); 
-    
-  text( "Latest forces data [t(ms) Fx Fy Fz (N) Tx Ty Tz(Nm)]: \r\n   " + sData  , 15, 255);  
+  text( "Latest Microscribe motion  [ t(ms)    x y z (cm)   r p y(deg) ] ...  \r\n   " + mData , 15, 290); 
+  /*sData = sData.substring(0, sData.length()-1) + "   " + 
+        nf(myTipPos.x,0,5) + " " + nf(myTipPos.y,0,5) + " " +nf(myTipPos.z,0,5) +
+        nf(myTipRPY.x,0,5) + " " + nf(myTipRPY.y,0,5) + " " + nf(myTipRPY.z,0,5) + 
+        "  " + (millis() - t0_ms);*/
+    //println(  );
+    //println("\t after: x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
+    //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );
+
+  //if ( tempString 
+  text( "Latest forces data [ t(ms) Fx Fy Fz (N) Tx Ty Tz(Nm) ] ... \r\n   " + tempString  , 15, 255);  
   
   
   
@@ -351,7 +346,7 @@ public void draw(){
   }
   
   if (amRecording) {
-    motionLog.print( sData );
+    //motionLog.print( sData ); // this should be done in the time and serialEvent handlers below
     if ( vid1Selection > 0 ) videoExport1.saveFrame();
     if ( vid2Selection > 0 ) videoExport2.saveFrame();
   }
@@ -379,8 +374,8 @@ public void customGUI(){
 }
 
 void onTimerEvent() {
-  int millisDiff = millis() - lastMicroscribeMillis;
-  lastMicroscribeMillis = millisDiff + lastMicroscribeMillis;  
+  t_ms = millis() - t0_ms;  // time in ms since begin recording got started 
+  lastMicroscribeMillis = t_ms; //millisDiff + lastMicroscribeMillis;  
   myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
   myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
   //System.out.println("Got a timer event at " + millis() + "ms (" + millisDiff + ")!");
@@ -388,7 +383,66 @@ void onTimerEvent() {
   //ellipse(random(width), random(height), random(100), random(100));
   //println("\t x, y, z | r p y = " + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
   //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );
-  mData = "% " + millis() + myTipPos.x + ", " + myTipPos.y + ", " +myTipPos.z +
-           " , " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z ;
+  //sData = lastMicroscribeMillis + ",  " + sPort.readString();
+  mData =  lastMicroscribeMillis + ",   " + 
+        nfs(myTipPos.x, 0, 3) + ", " + nfs(myTipPos.y, 0, 3) + ", " + nfs(myTipPos.z, 0, 3) + ",   " +
+        nfs(myTipRPY.x, 0, 3) + ", " + nfs(myTipRPY.y, 0, 3) + ", " + nfs(myTipRPY.z, 0, 3) + ",    "  
+        + ((millis() - t0_ms ) ) + "\r\n";   
+  if ( amRecording ) {    
+    motionLog.print( mData );
+    //forcesLog.print( sData );
+  }  
   
+  
+  // get arduino data if it is available (should  be),
+  if (sPort.available() > 0) {  
+    // the moment it arrives get the microscribe data and a timestamp
+    //myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
+    //myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
+    // microscribeTime = ;    
+    sData =  sPort.readString();
+    //while (sPort.available() > 0)
+    //sData =  sPort.readString();
+    //sData = sData + "% lastMicroscribeTime(above samples): " + lastMicroscribeMillis; 
+    //sData =  sPort.readStringUntil('\n');    
+    //sData =  sPort.readString(); 
+    //print("serial data: " + sData);
+    int i;
+    i = sData.indexOf( '\n' );
+    if (i <= 0 )
+      tempString = "% Arduino-ATI NetCANOEM board providing no data or not connected\r\n";
+    else
+      tempString = sData.substring(0, i);// sData.indexOf( '\n' ));
+        
+    // usually, the last thing in sData should  be a '\n'; check that.  
+    if( '\n' != sData.charAt( sData.length()-1 ) ) 
+    {
+      //print("last sData char not '\n' !!  (check data file for integrity) \r\n");
+    } else if ( amRecording )  
+    {
+      forcesLog.print( sData.substring( 0, sData.length()-3 ) ); // log everthing but last newline 
+      forcesLog.print( "   % sampleTime = " + lastMicroscribeMillis + "\r\n");
+    }
+     
+    
+      
+  }
+  
+  
+}
+/*
+void serialEvent(Serial p) { 
+  sData = lastMicroscribeMillis + ",  " +p.readString();
+   
+  if ( amRecording ){     
+    forcesLog.print( sData );
+  }
+  
+} */
+
+
+void exit() {
+  println("exiting");
+  sPort.write('x'); 
+  super.exit();
 }
