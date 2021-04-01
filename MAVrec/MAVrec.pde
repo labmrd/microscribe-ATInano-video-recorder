@@ -16,6 +16,7 @@ private int lastMicroscribeMillis = 0;
 //String comPort = "COM4";
 String comPort = Serial.list()[Serial.list().length-1];   
 int  comBaudrate = 115200;
+int serialTimeout = 3000; // ms to wait for serial response
 
 
 // Camera Defaults
@@ -43,11 +44,13 @@ String [] cameras;
 String [] videoOptions;
 int samplePeriod  = 100;   // ms.  On samle every samplePeriod seconds
 Serial sPort;  
-String sData; // serial data (timestamps plus ATI 
+String sData; // serial data (timestamps plus ATI )
+String atiInfo; // holds info extracted from ATI (or nothing if not connected)
 String mData; // microscribe data string
 String tempString;
 int numSerialPorts;
 
+boolean ATIinitialized; 
 boolean amRecording;
 boolean amReady;
 
@@ -192,11 +195,12 @@ public void setup(){
   
   
   // Establish connection to arduino if serial port is available
-  String [] serialList = Serial.list();
+  String [] serialList = Serial.list();  
   numSerialPorts = serialList.length;
   println("Available serial ports: ");  printArray( serialList );  
   println("Last serial port:  " + Serial.list()[ serialList.length - 1 ] );
-  
+  //print("sPort (before open): ");  println( sPort );
+  //print("sPort == null: ");  println( sPort == null );
   try {
    sPort = new Serial(this, comPort, comBaudrate );
    //sPort = new Serial(this, comPort, comBaudrate );
@@ -204,9 +208,30 @@ public void setup(){
    // should use Serial.println("") in arduino code
    //sPort.bufferUntil('\n');    // this should avoid breaking packets between \n characters (?)
   } finally {} 
+  sPort.write('x');
+  sPort.clear();
+  sPort.write('I');  //delay(5000);
+  //print("sPort (after open): ");  println( sPort );
+  //print("sPort == null: ");  println( sPort == null );
+  t0_ms = millis();
   
-  
-  
+  println("Initializing ATI nano 17...\r\n");
+  while( sPort.available() < 500 && ( (millis() - t0_ms) < serialTimeout ) ) 
+    delay(1);/*do nothing*/  
+  print("sPort.available(): ");  println( sPort.available() );
+  sData = "";
+  t0_ms = millis();
+  ATIinitialized = false;
+  while( ATIinitialized == false && ( (millis() - t0_ms) < serialTimeout ))
+  {
+    if( sPort.available() > 0)
+      sData = sData + sPort.readString();
+    if( sData.indexOf("ATI CONNECTED") != -1){
+      ATIinitialized = true;
+    }
+  }  
+  print("sData.indexOf(ATI CONNECTED) = "); println( sData.indexOf("ATI CONNECTED") );
+  println( sData );
   //surface.setResizable(true);
   
   // Important: set the output-framerate (sketch) 
@@ -312,6 +337,11 @@ public void draw(){
     //  " | " + myTipRPY.x + ", " + myTipRPY.y + ", " + myTipRPY.z );
 
   //if ( tempString 
+  if (sPort == null) {    
+    sData = "% ERROR: no arduino hardware connected on expected USB/Serial port. ";
+    tempString = sData;
+    println( sData );
+  }
   text( "Latest forces data [ t(ms) Fx Fy Fz (N) Tx Ty Tz(Nm) ] ... \r\n   " + tempString  , 15, 255);  
   
   
@@ -393,9 +423,14 @@ void onTimerEvent() {
     //forcesLog.print( sData );
   }  
   
-  
-  // get arduino data if it is available (should  be),
-  if (sPort.available() > 0) {  
+  /*if (sPort == null) {    
+    sData = "% ERROR: no arduino hardware connected on expected USB/Serial port. ";
+    tempString = sData;
+    println( sData );
+    // get arduino data if it is available (should  be),
+  } else*/
+  if (sPort.available() > 0) 
+  {
     // the moment it arrives get the microscribe data and a timestamp
     //myCLibrary.INSTANCE.ArmGetTipPosition( myTipPos  );    
     //myCLibrary.INSTANCE.ArmGetTipOrientation( myTipRPY );
@@ -422,13 +457,8 @@ void onTimerEvent() {
     {
       forcesLog.print( sData.substring( 0, sData.length()-3 ) ); // log everthing but last newline 
       forcesLog.print( "   % sampleTime = " + lastMicroscribeMillis + "\r\n");
-    }
-     
-    
-      
-  }
-  
-  
+    }  
+  }  
 }
 /*
 void serialEvent(Serial p) { 

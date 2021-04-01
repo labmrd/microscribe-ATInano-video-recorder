@@ -1,22 +1,25 @@
 // ATI info for reading forces from the ATI NetCANOEM board
 
 // Global structure for a single streamed sample from ATI NetCANoem board
+
 struct streamingSample {
   unsigned long t_us;  // sample time in micros (as received by teensy)
   unsigned long t_ms;  // sample time in millis (as received by teensy)
-  signed short G0;     // order in which ';gauge vector' is received 0,2,4,1,3,5;
-  signed short G1;     // each should be 16 bit signed integer (short)   
-  signed short G2;     // confirmed on teensy 4.1 with sizeof( signed short ) -> 2
+  signed short G[6];  
+  /*signed short G0;     // order in which ';gauge vector' is received 0,2,4,1,3,5;
+  signed short G1;      // each should be 16 bit signed integer (short)   
+  signed short G2;      // confirmed on teensy 4.1 with sizeof( signed short ) -> 2
   signed short G3;
   signed short G4;
-  signed short G5;
+  signed short G5;*/
   unsigned char Check;// uint8 checksum+status; originally called 'check' in ATI Digital FT Modbus doc
   bool checksumError;    // 0: all is ok; true or 1 means bad
   bool statusError;      // error status reported during streaming (last bit of 'check' field) 0: all ok
 };
+signed short Gbias[6]; // used to Tare;  
 
 // GLOBAL variables:
-streamingSample gLatestSample;
+volatile streamingSample gLatestSample;
 unsigned long int gATIstatus;  // global status word, 0 means all good (16 bit, 2 bytes) (last bit, #15, is overall status)
 bool gATIsensorIsConnected;    // global flag; usually updated with every read.
 bool gATIisStreaming;          // global flag, Only true when values stream (i.e. you should wait until 13 byte chunks show up)
@@ -33,6 +36,8 @@ unsigned long t, t0;  // time keeping variables [us]
 String sCalibSerialNumber, sCalibPartNumber, sCalibFamilyId, sCalibTime, sForceUnits, sTorqueUnits; 
   
 float BasicMatrix[6][6];
+
+
 unsigned ForceUnitsCode;
 unsigned TorqueUnitsCode;
 float MaxRating[6];
@@ -275,7 +280,7 @@ void ATIreadHoldingRegister( unsigned short addr , unsigned short numPointsToRea
 	
 	unsigned short myCRC;
 	unsigned long T;
-	char incoming[512];  // used to process incoming messages that need a CRC check. 
+	unsigned char incoming[512];  // used to process incoming messages that need a CRC check. 
 	unsigned char addrHi, addrLo;
 	addrHi = addr >> 8;
 	addrLo = addr & 0x00FF;
@@ -438,7 +443,6 @@ bool ATIinitialize( void ){
   //Serial.println( ATIcalibrationBanner );  
   
   //  float BasicMatrix[6][6]; // have to read in 6 floats at a time due to MODBUS length restrictions
-  // float f = 0;
   float f2 = 0;
   //float *f_ptr;  // pointer to float  
   char  charArry[4];  // for swaping byte order to float

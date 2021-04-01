@@ -9,6 +9,7 @@ String bannerUnitsForces =
 public boolean beginRecording( ){
   
   sPort.write('x'); sPort.clear();
+  //sPort.write('i'); // get information from ATI (configuration file)
   sPort.write('b'); // this should reset arduino time counter to 0 (b for begin new recording)
   
   t0_ms = millis();

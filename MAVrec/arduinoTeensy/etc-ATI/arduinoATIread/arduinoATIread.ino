@@ -7,11 +7,12 @@
 */
 
 // set this to the hardware serial port you wish to use
-#define HWSERIAL    Serial1
+#define HWSERIAL    Serial1  // wire D0, D1 to RS485 Sparkfun breakout Rx, Tx;; 3.3v  and gnd
+#define HWSERIAL_TX_ENABLE_PIN 2 // wire to sparkfun RTS
 #define ATI_BAUD    1250000
 #define TIMEOUT_US  200000  // after ~100 ms, stop waiting to hear from ATI
 #define ATI_CALIBRATION_ADDR 0x00E3 // address of calibration # to load from netcanoem's 
-									// internal list (should match sensor Part #)                                      
+									 // internal list (should match sensor Part #)                                      
                                     // see pg 2 of Digital FT Modbus Interface.pdf doc
 #include "atiFunctions.h"
 
@@ -20,18 +21,19 @@
 // 's' - get status
 // 'b' - begin streaming
 // 'x' - stop streaming
-void handleSerialInput ( unsigned char incomingByte );
+//void handleMySerialInput ( unsigned char incomingByte );
 
 
 // Create an IntervalTimer object 
 IntervalTimer sampleTimer;
-unsigned int samplePeriod = 10000;  // in us, e.g. 10ms sampling period is 10000us
+unsigned int samplePeriod = 20000;  // in us, e.g. 10ms sampling period is 10000us
 volatile  unsigned long t_ms, t0_ms;    // bookeeping in ms
 unsigned long tPrev_ms;
 volatile streamingSample currentSample; // updated more slowly than latestSample
 void timerISR() {
   t_ms = millis() - t0_ms;
   currentSample.t_us = gLatestSample.t_us;
+  currentSample.t_ms = gLatestSample.t_ms;
   currentSample.G0 = gLatestSample.G0;
   currentSample.G1 = gLatestSample.G1;
   currentSample.G2 = gLatestSample.G2;
@@ -41,7 +43,7 @@ void timerISR() {
   currentSample.checksumError = gLatestSample.checksumError;
   currentSample.statusError = gLatestSample.statusError;
 }
-
+#include "handleMySerial.h"
 //////////////////////////////////////////////////////////////////////////////////
 ///////////////////////    SETUP    //////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +51,7 @@ void timerISR() {
 void setup() {
   Serial.begin( 115200 );
   HWSERIAL.begin( ATI_BAUD, SERIAL_8E1 ); // default Baud reate of netcanoem is 1.25Mbps
+  Serial1.transmitterEnable( HWSERIAL_TX_ENABLE_PIN );
   t0_ms = millis();
   sampleTimer.begin( timerISR, samplePeriod );
   
@@ -75,7 +78,7 @@ void setup() {
          Serial.print("unknown\n");
    }*/
 
-   Serial.print("size of: "); Serial.println( sizeof(short) );
+   //Serial.print("size of: "); Serial.println( sizeof(short) );
    //ATIstartStreaming() ;
    t0_ms = millis();
    tPrev_ms = t_ms;
@@ -95,7 +98,7 @@ void loop() {
  
   // Handle Serial Commands from PC
   if (Serial.available() > 0)      
-    handleSerialInput ( Serial.read() ) ;
+    handleMySerialInput ( Serial.read() ) ;
 
 
   // Update globals with streaming data (if any) as fast as possible
@@ -159,8 +162,9 @@ void loop() {
 
  
   if ( gATIisStreaming && (t_ms != tPrev_ms )) {
-    //Serial.print( currentSample.t_us ); Serial.print("\t");
+    Serial.print( currentSample.t_us ); Serial.print("\t");
     tPrev_ms = t_ms;
+    
     Serial.print( currentSample.G0 ); Serial.print("\t");
     Serial.print( currentSample.G1 ); Serial.print("\t");
     Serial.print( currentSample.G2 ); Serial.print("\t");
@@ -178,7 +182,3 @@ void loop() {
 
   
 }
-
-
-
-#include "handleSerial.h"
