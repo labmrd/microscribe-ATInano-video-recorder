@@ -218,20 +218,25 @@ public void setup(){
   println("Initializing ATI nano 17...\r\n");
   while( sPort.available() < 500 && ( (millis() - t0_ms) < serialTimeout ) ) 
     delay(1);/*do nothing*/  
-  print("sPort.available(): ");  println( sPort.available() );
+  //print("sPort.available(): ");  println( sPort.available() );
   sData = "";
   t0_ms = millis();
   ATIinitialized = false;
   while( ATIinitialized == false && ( (millis() - t0_ms) < serialTimeout ))
   {
     if( sPort.available() > 0)
-      sData = sData + sPort.readString();
+      sData = sData + sPort.readString();      
     if( sData.indexOf("ATI CONNECTED") != -1){
-      ATIinitialized = true;
+      ATIinitialized = true;      
     }
   }  
-  print("sData.indexOf(ATI CONNECTED) = "); println( sData.indexOf("ATI CONNECTED") );
-  println( sData );
+  if (ATIinitialized == true) {
+    atiInfo = sData;
+  } else {
+    atiInfo = "% no ATI or Arduino connected; check connections and restart gui. \r\n";
+    tempString = atiInfo; // feeds this to the GUI
+  }
+  
   //surface.setResizable(true);
   
   // Important: set the output-framerate (sketch) 
@@ -342,7 +347,9 @@ public void draw(){
     tempString = sData;
     println( sData );
   }
-  text( "Latest forces data [ t(ms) Fx Fy Fz (N) Tx Ty Tz(Nm) ] ... \r\n   " + tempString  , 15, 255);  
+  if( tempString.indexOf("  %") > 0)
+    tempString = tempString.substring(0, tempString.indexOf("  %"));
+  text( "Latest forces data [ t(ms) Fx Fy Fz (N) Tx Ty Tz(mNm) ] ... \r\n   " + tempString   , 15, 255);  
   
   
   
@@ -452,11 +459,11 @@ void onTimerEvent() {
     // usually, the last thing in sData should  be a '\n'; check that.  
     if( '\n' != sData.charAt( sData.length()-1 ) ) 
     {
-      //print("last sData char not '\n' !!  (check data file for integrity) \r\n");
+      print("last sData char not \\n !!  (check data file for integrity) \r\n");
     } else if ( amRecording )  
     {
-      forcesLog.print( sData.substring( 0, sData.length()-3 ) ); // log everthing but last newline 
-      forcesLog.print( "   % sampleTime = " + lastMicroscribeMillis + "\r\n");
+      forcesLog.print( sData.substring( 0, sData.length()-2 ) ); // log everthing but last newline 
+      forcesLog.print( "   % microscribeSampleTime = " + lastMicroscribeMillis + "\r\n");
     }  
   }  
 }

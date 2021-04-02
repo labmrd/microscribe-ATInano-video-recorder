@@ -45,8 +45,9 @@ public void textfieldFilename_change1(GTextField source, GEvent event) { //_CODE
 } //_CODE_:textfieldFilename:372857:
 
 public void buttonTare_click1(GButton source, GEvent event) { //_CODE_:buttonTare:588681:
-  println("buttonCamSettings - GButton >> GEvent." + event + " @ " + millis());
-  
+  //println("buttonCamSettings - GButton >> GEvent." + event + " @ " + millis());
+  println(" TARE-ing forces+torques.");
+  tareATIreadings();
 } //_CODE_:buttonTare:588681:
 
 public void dropListCam1_click1(GDropList source, GEvent event) { //_CODE_:dropListCam1:332469:

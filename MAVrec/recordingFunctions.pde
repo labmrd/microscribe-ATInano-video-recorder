@@ -2,18 +2,18 @@
 //     BEGIN/START Recording                         ///////
 ////////////////////////////////////////////////////////////
 String bannerUnitsMotion = 
+"% writingEndTime should match sampleTime.  If they differ, this is how much possible time elapsed during writing of data (jitter); \r\n"+
 "% sampleTime[ms]  X[mm] Y[mm] Z[mm] \t roll[deg] pitch[deg] yaw[deg]  writingEndTime[ms]\t\t" +  "% status info\r\n";
 String bannerUnitsForces = 
-"% actualHardwareTime[ms]\t Fx[N] Fy[N] Fz[N]   Tx[Nm] Ty[Nm] Tz[Nm]\t % microscribe sample time [ms] % status info\r\n";
+"% ATIbasicMatrix applied to G0...G5 to get Forces, Torques:  [F; T] = ATIbasicMtx * [ G ]\r\n"+
+"% actualHardwareTime[ms]\t Fx[N] Fy[N] Fz[N]   Tx[mNm] Ty[mNm] Tz[mNm]\t % microscribe sample time [us] G0 G1 G2 G3 G4 G5 checksumError statusError \r\n";
+public void  tareATIreadings() {
+  sPort.write('t');
+}
 
 public boolean beginRecording( ){
   
-  sPort.write('x'); sPort.clear();
-  //sPort.write('i'); // get information from ATI (configuration file)
-  sPort.write('b'); // this should reset arduino time counter to 0 (b for begin new recording)
   
-  t0_ms = millis();
-  //lastMicroscribeMillis = millis();
   
   fileTime = getTimestamp();
   fileName = fileStub + "_" + fileTime;
@@ -32,7 +32,7 @@ public boolean beginRecording( ){
                                 bannerUnitsMotion );
     forcesLog = createWriter( fileFolder + fileName + "_forces.txt");
     forcesLog.print( banner + "% Filename: \t\t " + 
-                                fileName + forcesFilenameEnd + "\r\n" + 
+                                fileName + forcesFilenameEnd + "\r\n" + atiInfo +
                                 bannerUnitsForces );
     
   } finally {  
@@ -70,6 +70,14 @@ public boolean beginRecording( ){
     videoExport2.startMovie();
   }
   
+  
+  // reset and start streaming ATI data...
+  sPort.write('x'); sPort.clear();
+  //sPort.write('i'); // get information from ATI (configuration file)
+  sPort.write('b'); // this should reset arduino time counter to 0 (b for begin new recording)
+  
+  t0_ms = millis();
+  //lastMicroscribeMillis = millis();
   
   
   
