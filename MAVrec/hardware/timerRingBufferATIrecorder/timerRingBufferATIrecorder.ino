@@ -206,7 +206,10 @@ void loop() {
       Serial.print( ringBuffer[iRead][0].Tz / (float)(CountsPerTorque/1000) );   
       Serial.print( "     % " );
       Serial.print( ringBuffer[iRead][0].t_us );      
-      Serial.print( ", iToRead:" );
+      Serial.print( ",  " ); 
+
+      // for ring buffer overflow and rollover debugging
+      /*Serial.print( ", iToRead:" );
       Serial.print( iToRead );
       Serial.print( ", iRead:" );
       Serial.print( iRead );
@@ -215,7 +218,7 @@ void loop() {
       Serial.print( ", lastRead:" ); 
       Serial.print( lastRead );
       Serial.print( ",  i:" ); 
-      Serial.print( i       );
+      Serial.print( i       );*/
       /*Serial.print( ringBuffer[iRead][0].G[0] );
       Serial.print( ",  " );
       Serial.print( ringBuffer[iRead][0].G[1] );
@@ -226,8 +229,8 @@ void loop() {
       Serial.print( ",  " ); 
       Serial.print( ringBuffer[iRead][0].G[4] );
       Serial.print( ",  " ); 
-      Serial.print( ringBuffer[iRead][0].G[5] );   */
-      Serial.print( ",  " ); 
+      Serial.print( ringBuffer[iRead][0].G[5] );   
+      Serial.print( ",  " ); */
       Serial.print( ringBuffer[iRead][0].checksumError );
       Serial.print( ",  " ); 
       Serial.print( ringBuffer[iRead][0].statusError );   
