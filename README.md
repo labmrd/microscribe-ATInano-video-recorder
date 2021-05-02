@@ -3,9 +3,11 @@
 This project creates a processing.org sketch to record and syncronize data from the following sources simultaneously:
 * 0, 1 or 2 usb cameras or similar video sources; dumping to separate mp4 files (no audio) 
 * a usb-serial source such as Teensy 3.6, 4.0, or 4.1 which extracts data from the devices below and dumps it to serial which the sketch dumps to a _data.txt file.
-* MicroScribe M or MX 6DoF (Microscribe plugs directly into Teensy USB host port, extracts usb packets, does timing sync, and forwards them to serial. Note this is only raw encoder readings and the arm kinematic link DH parameters needed to map them to Cartesian pose; not the Cartesian x,y,z,roll,pitch,yaw available from the microscribe windows utility (MUS).
+* MicroScribe M or MX 6DoF (Microscribe plugs directly into  PC USB, processing sketch calls microscribe windows dll calls via java).
 * ATI Nano17 or similar running on an ATI 9105-NETCANOEM board which forwards the extracted Fx, Fy,Fz, Tx, Ty, Tz forces as compensated by factory settings. 
 
+Video walkthroughs for hardware setup, assembly, connectsion, and use cases available here:
+https://www.youtube.com/playlist?list=PLA7mdmemHTEwr_EhA78e7k7b2WX9mksp5
 
 
 Pre-reqs (All library/binaries are included in this repo): 
@@ -22,7 +24,7 @@ Pre-reqs (All library/binaries are included in this repo):
 
 
 
-SETUP:
+SOFTWARE SETUP:
  1. Create the folder in C:\tissueCapture\    Make sure it has full read-write priviliges.  All recordings are dumped directly to C:\tissueCapture\recordedData\.  This is to avoid issues with Windows 10 synchronized folders, google drive, dropbox or similar auto-syncing which may interfere with robust, low-latency data capture.  Feel free to copy the recorded files over to any cloud-based utility *after* they are done recording (after closing the processing program). 
  2. Install Processing (from the provided installer) and make sure the required libraries are added ( G4P, Hamoid video capture ).  The sketch won't run until this is set up. 
  3. OPTIONAL: Confirm ffmpeg.exe works by openning a command line, navigating to where it lives (e.g. C:\tissueCapture\mavREC\ , type ffmpeg and hit ENTER)
@@ -31,6 +33,6 @@ SETUP:
  6. Now you can run the mavREC.pde processing sketch by clicking the desktop icon whenever you need to record any sessions.  
  7. Edit the filename you want for your study, set up/select the video sources.  When you hit RECORD, the following happens:
     a) A date/timestamp is added to your filename (this makes sure you never overwrite data)
-    b) Filename_DATASTAMP_notes.txt, _data.txt files are created.  These are human readable ascii where all measurements are stored.  Any notes you make in the app during this experiment will get dumped there too.  Including critical status updates.
-    c) Also _vid1.mp4 and _vid2.mp4 files will be created if you chose to record video sources.  NOTE: ALL FILES SHOULD ONLY BE READ/OPENED BY USERS **AFTER** THE RECORDING IS DONE.  Ideally, after you close the processing sketch completely (to make sure JAVA isn't taking forever to close and clean up files in the background).  
+    b) Filename_DATASTAMP_notes.txt, \_data.txt files are created.  These are human readable ascii where all measurements are stored.  Any notes you make in the app during this experiment will get dumped there too.  Including critical status updates.
+    c) Also \_vid1.mp4 and \_vid2.mp4 files will be created if you chose to record video sources.  NOTE: ALL FILES SHOULD ONLY BE READ/OPENED BY USERS **AFTER** THE RECORDING IS DONE.  Ideally, after you close the processing sketch completely (to make sure JAVA isn't taking forever to close and clean up files in the background).  
   
