@@ -67,3 +67,10 @@ type 'video' in search and select the following and install (each):
     + timerRingBufferATIrecorder\ [the teensy code running in the ATItoUSB box which talks to ATI NetCANoem board over RS485, initializes Nano17, and dumps force/torque data over serial to processing (MAVrec.pde)]
     + etc-arduino\, etc-ATI\, etc-microscribe\ [[IGNORE.  these are dev folder for different variants of using arduino teensy as a USB host or debugging ATI communication and Microscribe use.  Good for datasheets and documentation required to make everything work, including microscribe SDK 3.0]]
 + toInstall (folder has the version of processing needed for install.)
+
+Evidence of successful recording (Microscribe + ATI Nano + Video 1 + Video 2 using a usb 3 hub) is present at c:\tissueCapture\recordedData\ (where data is dumped by default).  You can inspect all files here: ./MAVrecWorksOnUWlaptop: https://drive.google.com/drive/folders/1nyl-fIE_CancuF4i32zxdRuDJcpmxvLl?usp=sharing
+
+## TO DO:
++ On fresh install, may need to add armdll64.dll to user\Documents\Processing3.5.4 or similar.  Make the code find execution directory and point there or similar project directory.
++ On fresh install, first run, need to select ffmpeg.exe.  This might as well be in c:/tissueCapture/ folder to avoid any cloud-based or virtual folder slowness. The instructions already say to install in C:\tissueCapture\ so this might work.  
+
