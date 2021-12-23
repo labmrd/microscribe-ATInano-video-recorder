@@ -1,5 +1,4 @@
 // ATI info for reading forces from the ATI NetCANOEM board
-
 // Global structure for a single streamed sample from ATI NetCANoem board
 
 struct streamingSample {
@@ -144,6 +143,9 @@ unsigned char ATIgetStatus( void ) {
 
 
   T = micros();
+
+  Serial.println("   ... getting status ...");  
+  //unsigned int n = HWSERIAL.available();
   // consume the expected response bytes from ATI NetCANOEM board (response ACK 5+2 bytes )
   while ( HWSERIAL.available() < 5+2 ) {
     /* do nothing */
@@ -155,6 +157,10 @@ unsigned char ATIgetStatus( void ) {
       Serial.println(" Internal Error: Failed to read status");
       return myStatus; // BREAK OUT OF THIS FUNCTION; No response from  ATI Sensor
     }
+    //Serial.println(HWSERIAL.available());
+    //Serial.println(micros() - T);
+    //if( HWSERIAL.available() > n )  {n = HWSERIAL.available(); Serial.print("HWSERIAL.available("); Serial.print( n ); Serial.println(")  ");}
+    
   }
 
   // while( HWSERIAL.available()) Serial.println( HWSERIAL.read(), HEX);
@@ -309,28 +315,34 @@ void ATIreadHoldingRegister( unsigned short addr , unsigned short numPointsToRea
 	HWSERIAL.write( atiReadHoldingReg, cmdLengthStatus ); HWSERIAL.flush();
 	
 	
-	/*
-	Serial.println("Let's get everything in response for 2 s...");	
+	
+	/*Serial.println("Let's get everything in response for 1 s...");	
 	T = micros();
-	while( micros()-T < 2000000 ) 
+	while( micros()-T < 1000000 ) 
 	{
 		delayMicroseconds( 1000 );
-		Serial.println( HWSERIAL.available());
-		
+    if( HWSERIAL.available()){
+		  Serial.print("HWSERIAL.available("); Serial.print( HWSERIAL.available()); Serial.print(")  ");
+    }
+    
 		if( HWSERIAL.available()) 
 		{
-			//Serial.print(micros());
-			//Serial.print("   "); 
-			//Serial.println( HWSERIAL.read(), HEX);
+			Serial.print(micros());
+			Serial.print("[us]     "); 
+			Serial.println( HWSERIAL.read() ,HEX);
 		}
 	}*/
 	
 	
-	T = micros();
+	T = micros(); 
 	// consume the expected response bytes from ATI NetCANOEM board (response ACK 5+2n bytes )
 	// the 5 comes from: address, command type, numberofBytes, crc1, crc2;
-    while ( HWSERIAL.available() < 5 + 2*numPointsToRead ) {
+  //unsigned int n = HWSERIAL.available();
+  while ( HWSERIAL.available() < 5 + 2*numPointsToRead ) {
 		/* do nothing */
+		
+		//if( HWSERIAL.available() > n )  {n = HWSERIAL.available(); Serial.print("HWSERIAL.available("); Serial.print( n ); Serial.println(")  ");}
+    
 		if ( micros() - T > TIMEOUT_US * 6 * 6 ) // longer timeout due to 6x6 matrix reads
 		{
 		  gATIsensorIsConnected = false;
@@ -422,7 +434,8 @@ bool ATIinitialize( void ){
   //  uint8 CalibSerialNumber[8], 
   ATIreadHoldingRegister( ATI_CALIBRATION_ADDR, 8/2);  // divide by two bc each register point is 2 bytes (16bit)
   sCalibSerialNumber =  tempBuffer ;
-  // Serial.print("sCalibSerialNumber = ");  Serial.println( sCalibSerialNumber );
+  //Serial.print("sCalibSerialNumber = ");  Serial.println( sCalibSerialNumber );
+  //return(-199);
   
   //  uint8 CalibPartNumber[32];
   ATIreadHoldingRegister( ATI_CALIBRATION_ADDR + (8)/2, 32/2);  // add previous read size to offset

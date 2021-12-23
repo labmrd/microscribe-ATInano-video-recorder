@@ -49,10 +49,10 @@ volatile unsigned long int t0_vol ;    // extra volitile timer, Just in case
 // set this to the hardware serial port you wish to use
 #define HWSERIAL    Serial1  // wire D0, D1 to RS485 Sparkfun breakout Rx, Tx;; 3.3v  and gnd
 #define HWSERIAL_TX_ENABLE_PIN 2 // wire to sparkfun RTS
-#define ATI_BAUD    1250000
-#define TIMEOUT_US  200000  // after ~100 ms, stop waiting to hear from ATI
+#define ATI_BAUD    1250000      // 1250000 (default) or 115200 or 19200 supported
+#define TIMEOUT_US  200000       // after ~100 ms, stop waiting to hear from ATI
 #define ATI_CALIBRATION_ADDR 0x00E3 // address of calibration # to load from netcanoem's 
-                   // internal list (should match sensor Part #)                                      
+                                    // internal list (should match sensor Part #)                                      
                                     // see pg 2 of Digital FT Modbus Interface.pdf doc
 #include "atiFunctions.h"
 
@@ -134,7 +134,7 @@ void setup() {
   //Serial.println(BANNER);
   Serial.flush();
 
-  HWSERIAL.begin( ATI_BAUD, SERIAL_8E1 ); // default Baud reate of netcanoem is 1.25Mbps
+  HWSERIAL.begin( ATI_BAUD, SERIAL_8E1 ); // default Baud rate of netcanoem is 1.25Mbps
   Serial1.transmitterEnable( HWSERIAL_TX_ENABLE_PIN );
 
   amRecording = false;
@@ -163,7 +163,7 @@ void loop() {
     // to read from ring bufffer, read myDataSample from: iRead = (currentIndex+1) % BUF_LENGTH location; 
     //                          THEN, WHEN DONE READING: set lastread = iRead
     unsigned int iToRead = (lastWritten - lastRead + BUF_LENGTH) % BUF_LENGTH;    
-    for ( int i = 0; i < iToRead; i++ ) {
+    for ( unsigned int i = 0; i < iToRead; i++ ) {
       
       iRead = (lastRead+1) % BUF_LENGTH;  // start reading next entry
       //enc = ringBuffer[iRead][0].t
