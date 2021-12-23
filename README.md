@@ -54,8 +54,8 @@ type 'video' in search and select the following and install (each):
 
 ##PROJECT FOLDER OVERVIEW:
 + **MAVrec (has all software, hardware designs, CAD, supporting libraries, etc. **
- + **MAVrec.pde  [MAIN PROGRAM.  edit top of this for software defaults.  This is the program you actually run]**
- + gui.pde     (supporting functions for stuff like button clicks, ignore)
+  + **MAVrec.pde  [MAIN PROGRAM.  edit top of this for software defaults.  This is the program you actually run]**
+  + gui.pde     (supporting functions for stuff like button clicks, ignore)
  + recordingFunctions.pde (supporting functions for starting/stoping and tracking recording, ignore)
  + microscribeFunctions.pde (supporting functions for calling microscribe dlls via JAVA calls, ignore)
  + ffmpeg.exe  (this is what encodes video to compressed mp4's in real time.  Don't delete it.)
