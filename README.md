@@ -53,17 +53,17 @@ type 'video' in search and select the following and install (each):
 
 
 ##PROJECT FOLDER OVERVIEW:
-+ **MAVrec (has all software, hardware designs, CAD, supporting libraries, etc. **
++ **MAVrec (has all software, hardware designs, CAD, supporting libraries, etc. )**
   + **MAVrec.pde  [MAIN PROGRAM.  edit top of this for software defaults.  This is the program you actually run]**
   + gui.pde     (supporting functions for stuff like button clicks, ignore)
- + recordingFunctions.pde (supporting functions for starting/stoping and tracking recording, ignore)
- + microscribeFunctions.pde (supporting functions for calling microscribe dlls via JAVA calls, ignore)
- + ffmpeg.exe  (this is what encodes video to compressed mp4's in real time.  Don't delete it.)
- + ffmpet.txt  (has encoding status (per frame) of last video recording.  Make a copy of this if you want rich video information per recording)
- + armdll64.dll (main dll for Microscribe 'Arm', don't touch this.)
- + code\, data\, GUI_BUILDER_DATA\,  [ these are auto-created by processing.  IGNORE THEM ]
- + **hardware\**  [MAIN folder for CAD designs, arduino teensy code for ATI to USB, ATI to USB box info, ]
-  + **CADdesigns\  [all physical parts of system, ATItoUSB box, Camera shell and microscribe M4 tool interfaces, tooltip holders]**
-  + timerRingBufferATIrecorder\ [the teensy code running in the ATItoUSB box which talks to ATI NetCANoem board over RS485, initializes Nano17, and dumps force/torque data over serial to processing (MAVrec.pde)]
-  + etc-arduino\, etc-ATI\, etc-microscribe\ [[IGNORE.  these are dev folder for different variants of using arduino teensy as a USB host or debugging ATI communication and Microscribe use.  Good for datasheets and documentation required to make everything work, including microscribe SDK 3.0]]
+  + recordingFunctions.pde (supporting functions for starting/stoping and tracking recording, ignore)
+  + microscribeFunctions.pde (supporting functions for calling microscribe dlls via JAVA calls, ignore)
+  + ffmpeg.exe  (this is what encodes video to compressed mp4's in real time.  Don't delete it.)
+  + ffmpet.txt  (has encoding status (per frame) of last video recording.  Make a copy of this if you want rich video information per recording)
+  + armdll64.dll (main dll for Microscribe 'Arm', don't touch this.)
+  + code\, data\, GUI_BUILDER_DATA\,  ( these are auto-created by processing.  IGNORE THEM )
+  + **hardware\**  [MAIN folder for CAD designs, arduino teensy code for ATI to USB, ATI to USB box info, ]
+    + **CADdesigns\  [all physical parts of system, ATItoUSB box, Camera shell and microscribe M4 tool interfaces, tooltip holders]**
+    + timerRingBufferATIrecorder\ [the teensy code running in the ATItoUSB box which talks to ATI NetCANoem board over RS485, initializes Nano17, and dumps force/torque data over serial to processing (MAVrec.pde)]
+    + etc-arduino\, etc-ATI\, etc-microscribe\ [[IGNORE.  these are dev folder for different variants of using arduino teensy as a USB host or debugging ATI communication and Microscribe use.  Good for datasheets and documentation required to make everything work, including microscribe SDK 3.0]]
 + toInstall (folder has the version of processing needed for install.
