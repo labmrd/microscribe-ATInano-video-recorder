@@ -23,7 +23,7 @@ int vid2Selection = 1;     // these selections only activate if useVideo1 (and u
 // Once recording is complete, then copy files over to a central repository or a cloud-sync'ed folder. 
 String fileStub = "testFile";  // initial filename that appears
 String fileTime = "YY.MM.DD_hh.mm.ss"; // getTimestamp();
-String fileFolder = "C:/tissueCapture/data/" ;
+String fileFolder = "C:/tissueCapture/recordedData/" ;
 String fileName = fileStub + "_" + fileTime;
 
 // Enter COM Port that ATI to USB box is using (contains Teensy 4.0 running Arduino).  
