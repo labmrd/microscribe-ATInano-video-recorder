@@ -24,7 +24,7 @@ Pre-reqs (All library/binaries are included in this repo):
 
 
 
-SOFTWARE SETUP:
+##SOFTWARE SETUP:
  1. Create the folder in C:\tissueCapture\    Make sure it has full read-write priviliges.  All recordings are dumped directly to C:\tissueCapture\recordedData\.  This is to avoid issues with Windows 10 synchronized folders, google drive, dropbox or similar auto-syncing which may interfere with robust, low-latency data capture.  Feel free to copy the recorded files over to any cloud-based utility *after* they are done recording (after closing the processing program).  
  2. When tissueCapture/ folder is created, download or checkout the entire repository from  https://github.com/labmrd/microscribe-ATInano-video-recorder.  You can either click the "Code" button and download a zip file (~500 MB) or use github to do a local checkout.  This will keep the most up-to-date code available.  e.g., use github desktop from https://desktop.github.com/, log in with a git account, and do a checkout of this repo:  https://github.com/labmrd/microscribe-ATInano-video-recorder/.  If you downloaded a zip file, unzip it somewhere.  Either way, move the folder "./MAVrec/" to c:\tissueCapture\ so it's in "c:\tissueCapture\MAVrec\"
 
@@ -50,3 +50,20 @@ type 'video' in search and select the following and install (each):
     b) Filename_DATASTAMP_notes.txt, \_data.txt files are created.  These are human readable ascii where all measurements are stored.  Any notes you make in the app during this experiment will get dumped there too.  Including critical status updates.
     c) Also \_vid1.mp4 and \_vid2.mp4 files will be created if you chose to record video sources.  NOTE: ALL FILES SHOULD ONLY BE READ/OPENED BY USERS **AFTER** THE RECORDING IS DONE.  Ideally, after you close the processing sketch completely (to make sure JAVA isn't taking forever to close and clean up files in the background).  
   
+
+
+##PROJECT FOLDER OVERVIEW:
++ **MAVrec (has all software, hardware designs, CAD, supporting libraries, etc. **
+ + **MAVrec.pde  [MAIN PROGRAM.  edit top of this for software defaults.  This is the program you actually run]**
+ + gui.pde     (supporting functions for stuff like button clicks, ignore)
+ + recordingFunctions.pde (supporting functions for starting/stoping and tracking recording, ignore)
+ + microscribeFunctions.pde (supporting functions for calling microscribe dlls via JAVA calls, ignore)
+ + ffmpeg.exe  (this is what encodes video to compressed mp4's in real time.  Don't delete it.)
+ + ffmpet.txt  (has encoding status (per frame) of last video recording.  Make a copy of this if you want rich video information per recording)
+ + armdll64.dll (main dll for Microscribe 'Arm', don't touch this.)
+ + code\, data\, GUI_BUILDER_DATA\,  [ these are auto-created by processing.  IGNORE THEM ]
+ + **hardware\**  [MAIN folder for CAD designs, arduino teensy code for ATI to USB, ATI to USB box info, ]
+  + **CADdesigns\  [all physical parts of system, ATItoUSB box, Camera shell and microscribe M4 tool interfaces, tooltip holders]**
+  + timerRingBufferATIrecorder\ [the teensy code running in the ATItoUSB box which talks to ATI NetCANoem board over RS485, initializes Nano17, and dumps force/torque data over serial to processing (MAVrec.pde)]
+  + etc-arduino\, etc-ATI\, etc-microscribe\ [[IGNORE.  these are dev folder for different variants of using arduino teensy as a USB host or debugging ATI communication and Microscribe use.  Good for datasheets and documentation required to make everything work, including microscribe SDK 3.0]]
++ toInstall (folder has the version of processing needed for install.
