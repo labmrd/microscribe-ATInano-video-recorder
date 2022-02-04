@@ -5,10 +5,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-boolean useMicroScribe = true;
+boolean useMicroScribe = false;
 boolean useATInano17   = true;
-boolean useVideo1      = true;   // must be true to have any video recording.  If false, no video recording whatsoever.
-boolean useVideo2      =false;   // only set true if useVideo1 is *ALSO* true.  
+boolean useVideo1      = true;    // must be true to have any video recording.  If false, no video recording whatsoever.
+boolean useVideo2      = false;   // only set true if useVideo1 is *ALSO* true.  
 
 // Camera Defaults         // The O.S. provides a list of connected cameras that are available ( 0, 1, 2,  etc.  )
                            // if you have cam 0 and 1 plugged in, then unplug cam 0; cam 1 becomes cam 0 in the OS.
@@ -27,10 +27,13 @@ String fileFolder = "C:/tissueCapture/recordedData/" ;
 String fileName = fileStub + "_" + fileTime;
 
 // Enter COM Port that ATI to USB box is using (contains Teensy 4.0 running Arduino).  
-//String comPort = "COM4";                                       // Use this to hard-code the COM port that USB Teensy 4.0 Arduino is on. 
-String comPort = Serial.list()[Serial.list().length-1];          // This sets the COM port to last listed by O.S.  (usually correct)     
-int  comBaudrate = 384000;
+String comPort ="";    // Use this to hard-code the COM port that USB Teensy 4.0 Arduino is on. 
+                       //    ""    -- will attatch to last serial port (something MUST be plugged in)
+                       //   "COM9" -- will attach to COM9, expecting arduino to be there. 
+int comBaudrate = 384000;
 int serialTimeout = 3000; // ms to wait for serial response
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -142,14 +145,31 @@ public void setup(){
   }
   
   if (useATInano17) {
+    
     // Establish connection to arduino if serial port is available
     String [] serialList = Serial.list();  
     numSerialPorts = serialList.length;
-    println("Available serial ports: ");  printArray( serialList );  
-    println("Last serial port:  " + Serial.list()[ serialList.length - 1 ] );
+    println("Available serial ports: [" + numSerialPorts + "] " );  printArray( serialList );  
+    if ( serialList.length < 1 ) {
+        println("NO ARDUINO SERIAL DEVICES PLUGGED IN!   ...ABORTING");
+        useATInano17 = false;
+        exit();
+        return;
+    }
+    
+    if ( comPort == "" ) {
+        println("Attempting to find and connect on last serial port listed ..."  );              
+        println("Last serial port:  " + Serial.list()[ serialList.length - 1 ] );  
+        comPort = Serial.list()[ serialList.length - 1 ];
+    } else {
+      println("Attempting to connect on user-provided comPort: " + comPort );    
+    }
+      
+    
     //print("sPort (before open): ");  println( sPort );
     //print("sPort == null: ");  println( sPort == null );
     try {
+     
      sPort = new Serial(this, comPort, comBaudrate );
      //sPort = new Serial(this, comPort, comBaudrate );
      // don’t read the serial buffer until a new line char
@@ -368,7 +388,7 @@ void keyPressed() {
   }
 }
 
-// Use this method to add additional statements
+// Use this method to add additiconal statements
 // to customise the GUI controls
 public void customGUI(){
   
