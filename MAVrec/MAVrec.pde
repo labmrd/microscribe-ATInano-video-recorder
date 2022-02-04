@@ -5,7 +5,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-boolean useMicroScribe = false;
+boolean useMicroScribe = true;
 boolean useATInano17   = true;
 boolean useVideo1      = true;    // must be true to have any video recording.  If false, no video recording whatsoever.
 boolean useVideo2      = false;   // only set true if useVideo1 is *ALSO* true.  
@@ -151,7 +151,7 @@ public void setup(){
     numSerialPorts = serialList.length;
     println("Available serial ports: [" + numSerialPorts + "] " );  printArray( serialList );  
     if ( serialList.length < 1 ) {
-        println("NO ARDUINO SERIAL DEVICES PLUGGED IN!   ...ABORTING");
+        println("NO ATInano/ARDUINO SERIAL DEVICES PLUGGED IN!   ...ABORTING");
         useATInano17 = false;
         exit();
         return;
